@@ -1,0 +1,2279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Skills · Guía Avanzada 2026</title>
+<meta name="description" content="Guía completa y avanzada sobre Agent Skills de Anthropic/Claude. Incluye las novedades de 2026: Dreaming, Outcomes, Multi-Agent Orchestration, Managed Agents, Add-ins, el estándar abierto agentskills.io y las últimas mejoras de junio (/reload-skills, Opus 4.8, plugins auto-load).">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Highlight.js para syntax highlighting -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/markdown.min.js"></script>
+
+<!-- Mermaid para diagramas -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+
+<style>
+:root {
+  --color-bg: #0b0d12;
+  --color-bg-alt: #11141c;
+  --color-bg-card: #161a24;
+  --color-bg-hover: #1d2230;
+  --color-border: #232938;
+  --color-border-strong: #2c3344;
+  --color-text: #e6e9f0;
+  --color-text-muted: #9ba3b4;
+  --color-text-dim: #6b7280;
+  --color-primary: #d97757;
+  --color-primary-light: #e89976;
+  --color-primary-dark: #b85d3f;
+  --color-accent: #6c8aff;
+  --color-success: #4ade80;
+  --color-warning: #fbbf24;
+  --color-danger: #f87171;
+  --color-purple: #a78bfa;
+  --color-cyan: #22d3ee;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  --sidebar-width: 290px;
+  --content-max: 880px;
+}
+
+[data-theme="light"] {
+  --color-bg: #fafaf7;
+  --color-bg-alt: #ffffff;
+  --color-bg-card: #ffffff;
+  --color-bg-hover: #f3f3ef;
+  --color-border: #e6e4dd;
+  --color-border-strong: #d4d1c7;
+  --color-text: #1a1815;
+  --color-text-muted: #57544c;
+  --color-text-dim: #8a877e;
+  --color-primary: #c5573d;
+  --color-primary-light: #d97757;
+  --color-primary-dark: #a04428;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.12);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.65;
+  font-size: 16px;
+  transition: background 0.3s ease, color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--color-primary); color: white; }
+
+/* ---------- TOP BAR ---------- */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: rgba(11,13,18,0.85);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  border-bottom: 1px solid var(--color-border);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 16px;
+}
+[data-theme="light"] .topbar { background: rgba(250,250,247,0.9); }
+
+.brand {
+  display: flex; align-items: center; gap: 12px;
+  font-weight: 700; font-size: 17px; letter-spacing: -0.01em;
+}
+.brand-logo {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  border-radius: 8px;
+  display: grid; place-items: center;
+  font-weight: 800; color: white; font-size: 16px;
+  box-shadow: 0 4px 12px rgba(217,119,87,0.3);
+}
+.brand-meta {
+  font-size: 11px; color: var(--color-text-muted);
+  font-weight: 400; letter-spacing: 0.04em; text-transform: uppercase;
+}
+
+.topbar-spacer { flex: 1; }
+
+.search-box {
+  position: relative;
+  width: 340px;
+}
+.search-box input {
+  width: 100%;
+  height: 36px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 0 14px 0 38px;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  transition: all 0.2s;
+}
+.search-box input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(217,119,87,0.15);
+}
+.search-box::before {
+  content: ''; position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  width: 16px; height: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239ba3b4' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+}
+
+.iconbtn {
+  width: 36px; height: 36px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  display: grid; place-items: center;
+  transition: all 0.2s;
+}
+.iconbtn:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.iconbtn svg { width: 18px; height: 18px; }
+
+/* ---------- LAYOUT ---------- */
+.layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  margin-top: 60px;
+  min-height: calc(100vh - 60px);
+}
+
+/* ---------- SIDEBAR ---------- */
+.sidebar {
+  background: var(--color-bg-alt);
+  border-right: 1px solid var(--color-border);
+  padding: 28px 20px 48px;
+  position: sticky;
+  top: 60px;
+  height: calc(100vh - 60px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+.sidebar::-webkit-scrollbar { width: 6px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: 3px; }
+
+.toc-label {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+  color: var(--color-text-dim); text-transform: uppercase;
+  margin-bottom: 12px; padding: 0 10px;
+}
+.toc { list-style: none; }
+.toc li { margin: 1px 0; }
+.toc a {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  transition: all 0.15s;
+  border-left: 2px solid transparent;
+}
+.toc a:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+.toc a.active {
+  background: linear-gradient(90deg, rgba(217,119,87,0.12), transparent);
+  color: var(--color-primary);
+  border-left-color: var(--color-primary);
+}
+.toc-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-dim);
+  width: 22px; flex-shrink: 0;
+}
+.toc a.active .toc-num { color: var(--color-primary); }
+
+.toc-section {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--color-border);
+}
+
+.badge-new {
+  margin-left: auto;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--color-primary);
+  color: white;
+  letter-spacing: 0.04em;
+}
+
+/* ---------- MAIN ---------- */
+.main {
+  padding: 48px 64px 120px;
+  max-width: calc(var(--content-max) + 128px);
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ---------- HERO ---------- */
+.hero {
+  margin-bottom: 64px;
+  padding: 48px 0 24px;
+  position: relative;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -100px;
+  left: -200px;
+  right: -200px;
+  height: 500px;
+  background: radial-gradient(ellipse at 30% 40%, rgba(217,119,87,0.18), transparent 60%),
+              radial-gradient(ellipse at 70% 60%, rgba(108,138,255,0.12), transparent 60%);
+  pointer-events: none;
+  z-index: -1;
+}
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 12px; font-weight: 600;
+  padding: 5px 12px;
+  background: rgba(217,119,87,0.12);
+  color: var(--color-primary);
+  border: 1px solid rgba(217,119,87,0.3);
+  border-radius: 999px;
+  margin-bottom: 18px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.hero-tag::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--color-primary);
+  box-shadow: 0 0 8px var(--color-primary);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.hero h1 {
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, var(--color-text) 0%, var(--color-primary) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero-sub {
+  font-size: 19px; color: var(--color-text-muted);
+  max-width: 720px; line-height: 1.55;
+  margin-bottom: 32px;
+}
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+  margin-top: 36px;
+}
+.stat-card {
+  padding: 18px 20px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: all 0.2s;
+}
+.stat-card:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.stat-value {
+  font-size: 28px; font-weight: 800;
+  color: var(--color-primary);
+  letter-spacing: -0.02em;
+  font-family: var(--font-mono);
+}
+.stat-label {
+  font-size: 12px; color: var(--color-text-muted);
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* ---------- SECTIONS ---------- */
+section {
+  margin-bottom: 64px;
+  scroll-margin-top: 80px;
+}
+section h2 {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 24px;
+  display: flex; align-items: baseline; gap: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--color-border);
+}
+section h2 .h2-num {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  color: var(--color-primary);
+  font-weight: 600;
+  background: rgba(217,119,87,0.1);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+}
+section h3 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 36px 0 14px;
+  color: var(--color-text);
+}
+section h4 {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 24px 0 10px;
+  color: var(--color-text);
+}
+section p {
+  margin-bottom: 16px;
+  color: var(--color-text);
+}
+section p, section li { font-size: 15.5px; }
+section ul, section ol {
+  margin: 0 0 18px 22px;
+  color: var(--color-text);
+}
+section li { margin-bottom: 6px; line-height: 1.6; }
+section strong { color: var(--color-text); font-weight: 650; }
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(217,119,87,0.4);
+  transition: all 0.15s;
+}
+a:hover { color: var(--color-primary-light); border-bottom-style: solid; }
+
+/* ---------- CALLOUTS ---------- */
+.callout {
+  margin: 24px 0;
+  padding: 18px 22px 18px 60px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  position: relative;
+}
+.callout::before {
+  content: '';
+  position: absolute;
+  left: 20px; top: 18px;
+  width: 24px; height: 24px;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+.callout-info::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236c8aff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='12' y1='16' x2='12' y2='12'/%3E%3Cline x1='12' y1='8' x2='12.01' y2='8'/%3E%3C/svg%3E");
+}
+.callout-warn::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fbbf24' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z'/%3E%3Cline x1='12' y1='9' x2='12' y2='13'/%3E%3Cline x1='12' y1='17' x2='12.01' y2='17'/%3E%3C/svg%3E");
+}
+.callout-tip::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234ade80' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.5.4 1 1 1 1.7V18h6v-1.6c0-.7.5-1.3 1-1.7A7 7 0 0 0 12 2z'/%3E%3C/svg%3E");
+}
+.callout-danger::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f87171' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='4.93' y1='4.93' x2='19.07' y2='19.07'/%3E%3C/svg%3E");
+}
+.callout-new::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a78bfa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'/%3E%3C/svg%3E");
+}
+.callout-info { border-left-color: var(--color-accent); }
+.callout-warn { border-left-color: var(--color-warning); }
+.callout-tip { border-left-color: var(--color-success); }
+.callout-danger { border-left-color: var(--color-danger); }
+.callout-new { border-left-color: var(--color-purple); }
+.callout-title {
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.callout-info .callout-title { color: var(--color-accent); }
+.callout-warn .callout-title { color: var(--color-warning); }
+.callout-tip .callout-title { color: var(--color-success); }
+.callout-danger .callout-title { color: var(--color-danger); }
+.callout-new .callout-title { color: var(--color-purple); }
+
+/* ---------- CODE BLOCKS ---------- */
+pre {
+  background: #0a0c12 !important;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 18px 20px !important;
+  margin: 18px 0;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  line-height: 1.55;
+  position: relative;
+}
+[data-theme="light"] pre { background: #1a1d27 !important; }
+
+pre code { font-family: var(--font-mono) !important; padding: 0 !important; }
+:not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  padding: 2px 7px;
+  background: var(--color-bg-hover);
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  color: var(--color-primary);
+}
+
+.code-label {
+  position: absolute;
+  top: 8px; right: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: var(--font-mono);
+}
+
+.copy-btn {
+  position: absolute;
+  top: 8px; right: 12px;
+  width: 28px; height: 28px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  display: grid; place-items: center;
+  opacity: 0;
+  transition: all 0.2s;
+}
+pre:hover .copy-btn { opacity: 1; }
+.copy-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+.copy-btn svg { width: 14px; height: 14px; }
+.copy-btn.copied { color: var(--color-success); }
+
+/* ---------- TABLES ---------- */
+.table-wrap {
+  margin: 20px 0;
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-card);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+th, td {
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+th {
+  background: var(--color-bg-alt);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+tr:last-child td { border-bottom: none; }
+tbody tr { transition: background 0.15s; }
+tbody tr:hover { background: var(--color-bg-hover); }
+
+/* ---------- FEATURE GRID ---------- */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+.feature-card {
+  padding: 22px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.feature-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.feature-card:hover {
+  border-color: var(--color-border-strong);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.feature-card:hover::after { opacity: 1; }
+.feature-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: grid; place-items: center;
+  margin-bottom: 14px;
+  font-size: 20px;
+}
+.feature-icon-purple { background: rgba(167,139,250,0.15); color: var(--color-purple); }
+.feature-icon-orange { background: rgba(217,119,87,0.15); color: var(--color-primary); }
+.feature-icon-blue { background: rgba(108,138,255,0.15); color: var(--color-accent); }
+.feature-icon-green { background: rgba(74,222,128,0.15); color: var(--color-success); }
+.feature-icon-cyan { background: rgba(34,211,238,0.15); color: var(--color-cyan); }
+.feature-icon-amber { background: rgba(251,191,36,0.15); color: var(--color-warning); }
+
+.feature-card h4 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.feature-card p {
+  font-size: 13.5px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+.tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.tag-new { background: var(--color-purple); color: white; }
+.tag-beta { background: var(--color-warning); color: #1a1815; }
+.tag-preview { background: var(--color-accent); color: white; }
+
+/* ---------- TIMELINE ---------- */
+.timeline {
+  position: relative;
+  padding-left: 36px;
+  margin: 24px 0;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 12px; top: 8px; bottom: 8px;
+  width: 2px;
+  background: linear-gradient(180deg, var(--color-primary), var(--color-accent), var(--color-purple));
+}
+.timeline-item {
+  position: relative;
+  margin-bottom: 28px;
+}
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -32px; top: 4px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--color-bg);
+  border: 3px solid var(--color-primary);
+  box-shadow: 0 0 0 4px var(--color-bg);
+}
+.timeline-date {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary);
+  letter-spacing: 0.03em;
+  margin-bottom: 4px;
+}
+.timeline-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.timeline-desc {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+/* ---------- TABS ---------- */
+.tabs {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin: 20px 0;
+  background: var(--color-bg-card);
+}
+.tab-headers {
+  display: flex;
+  background: var(--color-bg-alt);
+  border-bottom: 1px solid var(--color-border);
+  overflow-x: auto;
+}
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 12px 20px;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.tab-btn:hover { color: var(--color-text); }
+.tab-btn.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+.tab-content { padding: 22px; display: none; }
+.tab-content.active { display: block; }
+.tab-content pre { margin: 0; }
+
+/* ---------- ARCH DIAGRAM ---------- */
+.arch-levels {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 24px 0;
+}
+.level-card {
+  padding: 22px 20px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  position: relative;
+  overflow: hidden;
+}
+.level-num {
+  position: absolute;
+  top: -10px; right: 16px;
+  font-family: var(--font-mono);
+  font-size: 56px;
+  font-weight: 800;
+  color: var(--color-bg-hover);
+  line-height: 1;
+  pointer-events: none;
+}
+.level-card h4 { position: relative; margin-bottom: 8px; font-size: 16px; }
+.level-card p { font-size: 13px; color: var(--color-text-muted); position: relative; line-height: 1.5; }
+.level-tokens {
+  display: inline-block;
+  margin-top: 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-primary);
+  background: rgba(217,119,87,0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  position: relative;
+}
+
+@media (max-width: 900px) {
+  .arch-levels { grid-template-columns: 1fr; }
+}
+
+/* ---------- COMPARISON ---------- */
+.compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 24px 0;
+}
+.compare-card {
+  padding: 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+.compare-card.bad { background: rgba(248,113,113,0.05); border-color: rgba(248,113,113,0.3); }
+.compare-card.good { background: rgba(74,222,128,0.05); border-color: rgba(74,222,128,0.3); }
+.compare-head {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.compare-card.bad .compare-head { color: var(--color-danger); }
+.compare-card.good .compare-head { color: var(--color-success); }
+@media (max-width: 768px) { .compare { grid-template-columns: 1fr; } }
+
+/* ---------- MERMAID ---------- */
+.mermaid-wrap {
+  margin: 24px 0;
+  padding: 24px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  text-align: center;
+}
+
+/* ---------- ECOSYSTEM ---------- */
+.ecosystem {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin: 24px 0;
+}
+.eco-card {
+  padding: 16px 14px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.eco-card:hover { border-color: var(--color-primary); transform: translateY(-2px); }
+.eco-emoji { font-size: 22px; display: block; margin-bottom: 6px; }
+
+/* ---------- FOOTER ---------- */
+footer {
+  margin-top: 80px;
+  padding-top: 32px;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+.footer-grid h5 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text);
+  margin-bottom: 10px;
+}
+.footer-grid ul { list-style: none; margin: 0; }
+.footer-grid li { margin-bottom: 6px; }
+.footer-grid a { font-size: 13px; }
+
+.search-results-empty {
+  display: none;
+  padding: 14px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  font-size: 14px;
+  margin: 12px 0;
+}
+
+.hidden-by-search { display: none !important; }
+
+/* ---------- BACK TO TOP ---------- */
+.fab {
+  position: fixed;
+  bottom: 28px; right: 28px;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: grid; place-items: center;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s;
+  z-index: 50;
+}
+.fab.visible { opacity: 1; transform: translateY(0); }
+.fab:hover { background: var(--color-primary-light); }
+.fab svg { width: 20px; height: 20px; }
+
+/* ---------- PROGRESS BAR ---------- */
+.progress-bar {
+  position: fixed;
+  top: 60px; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-purple));
+  z-index: 99;
+  width: 0%;
+  transition: width 0.1s;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 1024px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar {
+    position: fixed;
+    top: 60px;
+    left: -300px;
+    z-index: 90;
+    transition: left 0.3s;
+    width: 280px;
+    box-shadow: var(--shadow-lg);
+  }
+  .sidebar.open { left: 0; }
+  .main { padding: 32px 24px 80px; }
+  .search-box { width: 200px; }
+  .hero h1 { font-size: 36px; }
+  .menu-toggle { display: grid !important; }
+}
+.menu-toggle { display: none; }
+
+</style>
+</head>
+<body data-theme="dark">
+
+<div class="progress-bar" id="progressBar"></div>
+
+<header class="topbar">
+  <button class="iconbtn menu-toggle" id="menuToggle" aria-label="Menú">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+  <div class="brand">
+    <div class="brand-logo">⚡</div>
+    <div>
+      Agent Skills
+      <div class="brand-meta">Guía Avanzada · v2026.06</div>
+    </div>
+  </div>
+  <div class="topbar-spacer"></div>
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Buscar en la guía..." aria-label="Buscar">
+  </div>
+  <button class="iconbtn" id="themeToggle" aria-label="Cambiar tema" title="Cambiar tema">
+    <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="toc-label">Contenido</div>
+    <ul class="toc">
+      <li><a href="#intro"><span class="toc-num">1</span><span>¿Qué son las Agent Skills?</span></a></li>
+      <li><a href="#arquitectura"><span class="toc-num">2</span><span>Progressive Disclosure</span></a></li>
+      <li><a href="#primera-skill"><span class="toc-num">3</span><span>Tu primera Skill</span></a></li>
+      <li><a href="#avanzado"><span class="toc-num">4</span><span>Configuración avanzada</span></a></li>
+      <li><a href="#comparativa"><span class="toc-num">5</span><span>Skills vs. otras opciones</span></a></li>
+      <li><a href="#sharing"><span class="toc-num">6</span><span>Compartir Skills</span></a></li>
+      <li><a href="#troubleshoot"><span class="toc-num">7</span><span>Troubleshooting</span></a></li>
+      <li><a href="#ejemplo"><span class="toc-num">8</span><span>Ejemplo completo</span></a></li>
+      <li><a href="#seguridad"><span class="toc-num">9</span><span>Seguridad</span></a></li>
+    </ul>
+
+    <div class="toc-section">
+      <div class="toc-label">Novedades 2026</div>
+      <ul class="toc">
+        <li><a href="#estandar"><span class="toc-num">10</span><span>Estándar abierto</span><span class="badge-new">NEW</span></a></li>
+        <li><a href="#dreaming"><span class="toc-num">11</span><span>Dreaming</span><span class="badge-new">NEW</span></a></li>
+        <li><a href="#outcomes"><span class="toc-num">12</span><span>Outcomes</span><span class="badge-new">NEW</span></a></li>
+        <li><a href="#multiagent"><span class="toc-num">13</span><span>Multi-agent Orchestration</span><span class="badge-new">NEW</span></a></li>
+        <li><a href="#addins"><span class="toc-num">14</span><span>Add-ins y Plugins SDK</span><span class="badge-new">NEW</span></a></li>
+        <li><a href="#enterprise"><span class="toc-num">15</span><span>Enterprise &amp; Marketplaces</span><span class="badge-new">NEW</span></a></li>
+        <li><a href="#sdk"><span class="toc-num">16</span><span>Python SDK &amp; portabilidad</span><span class="badge-new">NEW</span></a></li>
+        <li><a href="#junio2026"><span class="toc-num">17</span><span>Novedades junio 2026</span><span class="badge-new">NEW</span></a></li>
+        <li><a href="#roadmap"><span class="toc-num">18</span><span>Roadmap y timeline</span></a></li>
+      </ul>
+    </div>
+
+    <div class="toc-section">
+      <div class="toc-label">Referencia</div>
+      <ul class="toc">
+        <li><a href="#cheatsheet"><span class="toc-num">∑</span><span>Cheatsheet</span></a></li>
+        <li><a href="#referencias"><span class="toc-num">📚</span><span>Referencias</span></a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="hero">
+      <div class="hero-tag">Edición 2026 · Actualizada</div>
+      <h1>Agent Skills: Guía avanzada para agentes IA</h1>
+      <p class="hero-sub">
+        Aprende a construir, distribuir y aprovechar las <strong>Agent Skills</strong> de Claude.
+        Esta edición incluye <strong>Dreaming</strong>, <strong>Outcomes</strong>,
+        <strong>Multi-Agent Orchestration</strong>, <strong>Managed Agents</strong>, <strong>Add-ins</strong>,
+        el SDK Python y las últimas mejoras de junio 2026 — <code>/reload-skills</code>,
+        <strong>Opus 4.8</strong> y el estándar abierto
+        <a href="https://agentskills.io" target="_blank" rel="noopener">agentskills.io</a>.
+      </p>
+      <div class="hero-stats">
+        <div class="stat-card">
+          <div class="stat-value">~100</div>
+          <div class="stat-label">Tokens por Skill (metadata)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">3</div>
+          <div class="stat-label">Niveles de carga progresiva</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">30+</div>
+          <div class="stat-label">Plataformas compatibles</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">6×</div>
+          <div class="stat-label">Mejora con Dreaming (Harvey)</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="searchEmpty" class="search-results-empty">
+      No se encontraron resultados. Prueba con otra palabra clave.
+    </div>
+
+    <!-- ========== 1. INTRO ========== -->
+    <section id="intro" data-search>
+      <h2><span class="h2-num">01</span> ¿Qué son las Agent Skills?</h2>
+      <p>
+        Las Agent Skills son <strong>capacidades modulares</strong> que extienden la funcionalidad de Claude.
+        Cada Skill empaqueta instrucciones, metadatos y recursos opcionales (scripts, plantillas,
+        documentación de referencia) que Claude utiliza <strong>automáticamente</strong> cuando son
+        relevantes para la tarea del usuario.
+      </p>
+
+      <div class="callout callout-tip">
+        <div class="callout-title">Analogía clave</div>
+        <p>Piensa en las Skills como una <strong>guía de onboarding para un nuevo empleado</strong>:
+        no le das todo el manual el primer día, sino que le proporcionas lo necesario según la tarea.
+        Claude carga la información por etapas, bajo demanda.</p>
+      </div>
+
+      <h3>¿Por qué existen?</h3>
+      <p>
+        El problema que resuelven es la <strong>repetición de contexto</strong>. Sin Skills, cada conversación
+        con un agente IA parte de cero. Las Skills permiten <em>"enseñar una vez, usar siempre"</em>.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Concepto</th><th>Sin Skills</th><th>Con Skills</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Contexto</td><td>Se repite cada conversación</td><td>Se carga automáticamente</td></tr>
+            <tr><td>Especialización</td><td>General purpose</td><td>Conocimiento de dominio</td></tr>
+            <tr><td>Consistencia</td><td>Variable entre sesiones</td><td>Reproducible</td></tr>
+            <tr><td>Eficiencia (tokens)</td><td>Alto consumo repetitivo</td><td>Carga progresiva on-demand</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========== 2. ARQUITECTURA ========== -->
+    <section id="arquitectura" data-search>
+      <h2><span class="h2-num">02</span> Arquitectura: Progressive Disclosure</h2>
+      <p>
+        El concepto arquitectónico central es la <strong>progressive disclosure</strong> (divulgación
+        progresiva). La información se carga en tres niveles:
+      </p>
+
+      <div class="arch-levels">
+        <div class="level-card">
+          <div class="level-num">1</div>
+          <h4>Metadatos</h4>
+          <p>Al arrancar, Claude solo lee el frontmatter YAML de cada Skill instalada.
+          Permite tener muchas Skills sin penalización en contexto.</p>
+          <span class="level-tokens">~100 tokens / Skill</span>
+        </div>
+        <div class="level-card">
+          <div class="level-num">2</div>
+          <h4>Instrucciones</h4>
+          <p>Cuando la petición coincide con la <code>description</code>, Claude lee el
+          <code>SKILL.md</code> completo y lo carga al contexto.</p>
+          <span class="level-tokens">&lt; 5.000 tokens</span>
+        </div>
+        <div class="level-card">
+          <div class="level-num">3</div>
+          <h4>Recursos</h4>
+          <p>Scripts, plantillas y referencias adicionales solo se cargan cuando se necesitan.
+          Los scripts se ejecutan vía bash — solo entra el <em>output</em> al contexto.</p>
+          <span class="level-tokens">On-demand</span>
+        </div>
+      </div>
+
+      <h3>Frontmatter de ejemplo</h3>
+      <pre><code class="language-yaml">---
+name: pdf-processing
+description: Extract text and tables from PDF files, fill forms, merge documents.
+  Use when working with PDF files or when the user mentions PDFs, forms, or
+  document extraction.
+---</code></pre>
+
+      <h3>Estructura de archivos</h3>
+      <pre><code class="language-bash">pdf-skill/
+├── SKILL.md          ← Instrucciones principales
+├── FORMS.md          ← Guía de relleno de formularios
+├── REFERENCE.md      ← Documentación detallada de API
+└── scripts/
+    └── fill_form.py  ← Script ejecutable (no consume contexto)</code></pre>
+
+      <h3>Flujo de ejecución</h3>
+      <div class="mermaid-wrap">
+        <div class="mermaid">
+flowchart LR
+  A[Startup] -->|~100 tokens| B[System prompt<br/>con metadata Skills]
+  B --> C{Usuario<br/>pregunta}
+  C -->|Match con description| D[Claude lee SKILL.md<br/>vía bash]
+  D --> E{¿Necesita<br/>recursos extra?}
+  E -->|Sí| F[Carga FORMS.md<br/>REFERENCE.md...]
+  E -->|No| G[Ejecuta tarea]
+  F --> G
+  G --> H[Respuesta al usuario]
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 3. PRIMERA SKILL ========== -->
+    <section id="primera-skill" data-search>
+      <h2><span class="h2-num">03</span> Creando tu primera Skill</h2>
+      <p>Una Skill es simplemente un <strong>directorio que contiene un archivo <code>SKILL.md</code></strong>:</p>
+
+      <pre><code class="language-bash">mi-skill/
+└── SKILL.md</code></pre>
+
+      <h3>Anatomía del SKILL.md</h3>
+      <pre><code class="language-markdown">---
+name: explain-code
+description: Explains code with visual diagrams and analogies. Use when explaining
+  how code works, teaching about a codebase, or when the user asks "how does this work?"
+---
+
+# Explain Code
+
+When explaining code, always include:
+
+1. **Start with an analogy**: Compare the code to something from everyday life
+2. **Draw a diagram**: Use ASCII art to show the flow, structure, or relationships
+3. **Walk through the code**: Explain step-by-step what happens
+4. **Highlight a gotcha**: What's a common mistake or misconception?
+
+Keep explanations conversational. For complex concepts, use multiple analogies.</code></pre>
+
+      <h3>Campos del frontmatter</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Campo</th><th>Requerido</th><th>Restricciones</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>name</code></td><td>Sí</td><td>Máx 64 chars · solo minúsculas/números/guiones · sin tags XML · sin palabras reservadas ("anthropic", "claude")</td></tr>
+            <tr><td><code>description</code></td><td>Sí</td><td>Máx 1024 chars · no vacío · sin tags XML</td></tr>
+            <tr><td><code>disable-model-invocation</code></td><td>No</td><td><code>true</code> = solo el usuario puede invocar</td></tr>
+            <tr><td><code>user-invocable</code></td><td>No</td><td><code>false</code> = solo Claude puede invocar automáticamente</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Dónde almacenar las Skills</h3>
+      <div class="tabs">
+        <div class="tab-headers">
+          <button class="tab-btn active" data-tab="cc">Claude Code</button>
+          <button class="tab-btn" data-tab="cai">Claude.ai</button>
+          <button class="tab-btn" data-tab="api">API</button>
+        </div>
+        <div class="tab-content active" data-tab="cc">
+          <p><code>~/.claude/skills/</code> → Skills personales (todos los proyectos)</p>
+          <p><code>.claude/skills/</code> → Skills del proyecto (compartidas vía git)</p>
+          <pre><code class="language-bash">mkdir -p ~/.claude/skills/mi-skill
+cd ~/.claude/skills/mi-skill
+touch SKILL.md</code></pre>
+        </div>
+        <div class="tab-content" data-tab="cai">
+          <p>Se suben como archivos <code>.zip</code> desde <strong>Settings → Features</strong>.</p>
+          <pre><code class="language-bash">cd mi-skill/
+zip -r mi-skill.zip .
+# Subir mi-skill.zip desde Claude.ai</code></pre>
+        </div>
+        <div class="tab-content" data-tab="api">
+          <p>Gestión mediante endpoints REST en <code>/v1/skills</code>.</p>
+          <pre><code class="language-bash">curl -X POST https://api.anthropic.com/v1/skills \
+  -H "x-api-key: $ANTHROPIC_API_KEY" \
+  -H "anthropic-version: 2026-01-01" \
+  -F "skill=@mi-skill.zip"</code></pre>
+        </div>
+      </div>
+
+      <h3>Probando la Skill</h3>
+      <ol>
+        <li><strong>Invocación automática</strong>: pregunta algo que coincida con la <code>description</code>.</li>
+        <li><strong>Invocación directa</strong>: usa el comando <code>/explain-code</code> (el <code>name</code> se convierte en slash command).</li>
+      </ol>
+    </section>
+
+    <!-- ========== 4. AVANZADO ========== -->
+    <section id="avanzado" data-search>
+      <h2><span class="h2-num">04</span> Configuración avanzada y Multi-File Skills</h2>
+
+      <h3>Control de invocación</h3>
+      <pre><code class="language-yaml">---
+name: deploy-production
+description: Deploys the application to production environment.
+disable-model-invocation: true  # Solo el usuario puede invocar con /deploy-production
+---</code></pre>
+
+      <pre><code class="language-yaml">---
+name: legacy-system-context
+description: Context about our legacy payment system architecture.
+user-invocable: false  # Solo Claude puede invocar automáticamente
+---</code></pre>
+
+      <h3>Skill multi-archivo</h3>
+      <pre><code class="language-bash">mi-skill-avanzada/
+├── SKILL.md                    ← Instrucciones principales (requerido)
+├── scripts/
+│   ├── validate_form.py        ← Código ejecutable para tareas deterministas
+│   └── extract_tables.sh
+├── references/
+│   ├── FORMS.md                ← Docs cargados en contexto según necesidad
+│   └── API_REFERENCE.md
+└── assets/
+    ├── template.docx           ← Plantillas para el output
+    └── company_logo.png</code></pre>
+
+      <h3>Description: vago vs. asertivo</h3>
+      <div class="compare">
+        <div class="compare-card bad">
+          <div class="compare-head">❌ Demasiado vago</div>
+          <pre style="margin:0"><code class="language-yaml">description: How to build a dashboard.</code></pre>
+        </div>
+        <div class="compare-card good">
+          <div class="compare-head">✅ Asertivo y explícito</div>
+          <pre style="margin:0"><code class="language-yaml">description: How to build a simple fast
+  dashboard to display data. Make sure to
+  use this skill whenever the user mentions
+  dashboards, data visualization, metrics,
+  or wants to display any kind of data,
+  even if they don't explicitly ask for
+  a 'dashboard'.</code></pre>
+        </div>
+      </div>
+
+      <div class="callout callout-warn">
+        <div class="callout-title">Buenas prácticas de tamaño</div>
+        <p><strong>SKILL.md</strong>: máximo ~500 líneas. Si excede, divide en archivos separados.
+        Claude tiende a <em>no activar</em> Skills cuando debería — sé "pushy" en la description.</p>
+      </div>
+
+      <h3>Tipos de contenido en una Skill</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Tipo</th><th>Carga</th><th>Tokens</th><th>Mejor para</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Reference content</strong></td><td>Inline en conversación</td><td>Moderado</td><td>Convenciones, patrones, guías de estilo</td></tr>
+            <tr><td><strong>Task content</strong></td><td>Paso a paso</td><td>Moderado</td><td>Deployments, commits, generación de código</td></tr>
+            <tr><td><strong>Scripts</strong></td><td>Solo output</td><td>Mínimo</td><td>Operaciones deterministas, validaciones</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========== 5. COMPARATIVA ========== -->
+    <section id="comparativa" data-search>
+      <h2><span class="h2-num">05</span> Skills vs. otras opciones de personalización</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Mecanismo</th><th>Cuándo usar</th><th>Persistencia</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Skills</strong></td><td>Tareas repetibles con procedimientos específicos</td><td>Permanente, on-demand</td></tr>
+            <tr><td><strong>CLAUDE.md</strong></td><td>Contexto general del proyecto</td><td>Siempre en contexto</td></tr>
+            <tr><td><strong>Prompts</strong></td><td>Tareas únicas, one-off</td><td>Solo la conversación actual</td></tr>
+            <tr><td><strong>Subagents</strong></td><td>Tareas paralelas, investigación aislada</td><td>Contexto independiente</td></tr>
+            <tr><td><strong>Hooks</strong></td><td>Automatización en eventos pre/post comando</td><td>Event-driven</td></tr>
+            <tr><td><strong>MCP</strong></td><td>Acceso a APIs, BD, herramientas externas</td><td>Conexión persistente</td></tr>
+            <tr><td><strong>Custom Instructions</strong></td><td>Preferencias globales (estilo, formato)</td><td>Todas las conversaciones</td></tr>
+            <tr><td><strong>Projects</strong></td><td>Conocimiento estático del proyecto</td><td>Siempre cargado</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-title">Regla práctica</div>
+        <p>Si te encuentras escribiendo <strong>el mismo prompt repetidamente</strong> en múltiples
+        conversaciones, es momento de crear una Skill.</p>
+      </div>
+
+      <h3>Skills + MCP: mejor juntos</h3>
+      <p>
+        Las Skills aportan <strong>conocimiento procedimental</strong> (cómo hacer algo).
+        MCP aporta <strong>acceso a herramientas</strong> (qué usar). Combinados:
+      </p>
+      <div class="mermaid-wrap">
+        <div class="mermaid">
+flowchart LR
+  M[MCP<br/>Jira, GitHub, Slack] --> C[Claude]
+  S[Skill<br/>Convenciones del equipo] --> C
+  C --> R[Acción correcta<br/>en la herramienta correcta]
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 6. SHARING ========== -->
+    <section id="sharing" data-search>
+      <h2><span class="h2-num">06</span> Compartiendo Skills</h2>
+
+      <h3>Nivel de equipo: vía repositorio Git</h3>
+      <pre><code class="language-bash">mi-proyecto/
+├── .claude/
+│   └── skills/
+│       ├── api-conventions/
+│       │   └── SKILL.md
+│       └── deploy-workflow/
+│           └── SKILL.md
+├── src/
+└── package.json</code></pre>
+
+      <h3>Nivel organizacional: Plugins</h3>
+      <pre><code class="language-bash"># Instalar desde el marketplace de Skills
+/plugin marketplace add anthropics/skills
+
+# Instalar desde un directorio local
+/plugin add /path/to/skill-directory</code></pre>
+
+      <h3>Alcance según plataforma</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Plataforma</th><th>Alcance de compartición</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Claude.ai</strong></td><td>Individual (cada usuario sube las suyas)</td></tr>
+            <tr><td><strong>Claude API</strong></td><td>Workspace-wide (todos los miembros del workspace)</td></tr>
+            <tr><td><strong>Claude Code</strong></td><td>Personal (<code>~/.claude/skills/</code>) o proyecto (<code>.claude/skills/</code>)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========== 7. TROUBLESHOOT ========== -->
+    <section id="troubleshoot" data-search>
+      <h2><span class="h2-num">07</span> Troubleshooting</h2>
+
+      <h3>La Skill no se activa</h3>
+      <ol>
+        <li>Revisa el campo <code>description</code> — debe ser específico y "pushy".</li>
+        <li>Incluye triggers explícitos: <em>"Use when the user mentions X, Y, or Z"</em>.</li>
+        <li>Verifica que el <code>name</code> cumple las restricciones (solo minúsculas, números, guiones).</li>
+        <li>Comprueba que la Skill está en el directorio correcto.</li>
+      </ol>
+
+      <h3>Errores de runtime</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Error</th><th>Causa probable</th><th>Solución</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Script falla</td><td>Dependencia no disponible</td><td>Verificar paquetes pre-instalados</td></tr>
+            <tr><td>Output incorrecto</td><td>Instrucciones ambiguas</td><td>Añadir ejemplos al SKILL.md</td></tr>
+            <tr><td>Contexto desbordado</td><td>SKILL.md demasiado largo</td><td>Dividir en archivos, usar progressive disclosure</td></tr>
+            <tr><td>Skill no encontrada</td><td>Ubicación incorrecta</td><td>Verificar path <code>~/.claude/skills/</code> o <code>.claude/skills/</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-warn">
+        <div class="callout-title">Limitaciones importantes</div>
+        <ul style="margin:8px 0 0 18px">
+          <li><strong>Sin sincronización cross-platform</strong> entre Claude.ai y API.</li>
+          <li><strong>API</strong>: sin acceso a red, sin instalación de paquetes en runtime.</li>
+          <li><strong>Claude.ai</strong>: acceso a red variable según configuración.</li>
+          <li><strong>Claude Code</strong>: acceso completo a red y sistema de archivos.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ========== 8. EJEMPLO ========== -->
+    <section id="ejemplo" data-search>
+      <h2><span class="h2-num">08</span> Ejemplo práctico completo</h2>
+      <p>Skill de <strong>revisión de código Python</strong> con checklist estructurado:</p>
+
+      <pre><code class="language-markdown">---
+name: python-code-review
+description: Reviews Python code for best practices, type hints, docstrings,
+  and common pitfalls. Use when the user asks to review Python code, check
+  code quality, find bugs, or improve their Python implementation. Also
+  activate when the user pastes Python code and asks for feedback.
+---
+
+# Python Code Review
+
+## Review checklist
+
+When reviewing Python code, evaluate these areas in order:
+
+### 1. Correctness
+- Does the code do what it claims?
+- Are there edge cases not handled?
+- Are there off-by-one errors?
+
+### 2. Type safety
+- Are type hints present on function signatures?
+- Are complex types properly annotated (e.g., `dict[str, list[int]]`)?
+
+### 3. Documentation
+- Do public functions have docstrings?
+- Are parameters and return values documented?
+
+### 4. Style and idioms
+- Follows PEP 8?
+- Uses Pythonic patterns (list comprehensions, context managers)?
+
+### 5. Performance
+- Are there unnecessary loops that could be vectorized?
+
+## Output format
+
+**Summary**: One paragraph overall assessment.
+**Critical Issues**: Must-fix problems.
+**Suggestions**: Improvements that would enhance quality.
+**Positive Aspects**: What's done well (always include this).</code></pre>
+    </section>
+
+    <!-- ========== 9. SEGURIDAD ========== -->
+    <section id="seguridad" data-search>
+      <h2><span class="h2-num">09</span> Consideraciones de seguridad</h2>
+
+      <div class="callout callout-danger">
+        <div class="callout-title">Trátalo como instalar software</div>
+        <p>Las Skills son poderosas porque dan a Claude nuevas capacidades mediante instrucciones y código.
+        El mismo nivel de precaución de instalar una librería aplica aquí.</p>
+      </div>
+
+      <ul>
+        <li><strong>Usa Skills solo de fuentes confiables</strong> (tú mismo o Anthropic oficial).</li>
+        <li><strong>Audita exhaustivamente</strong> Skills de terceros: revisa SKILL.md, scripts y recursos.</li>
+        <li><strong>Fuentes externas son peligrosas
+        </strong>: Skills que hacen fetch de URLs pueden contener instrucciones maliciosas (<em>prompt injection</em>).</li>
+      </ul>
+
+      <h3>Vectores de riesgo</h3>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon feature-icon-orange">🔓</div>
+          <h4>Exfiltración de datos</h4>
+          <p>Scripts que envían información sensible a sistemas externos.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon feature-icon-orange">⚠️</div>
+          <h4>Acceso no autorizado</h4>
+          <p>Lectura o escritura en partes del sistema fuera del alcance esperado.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon feature-icon-orange">💉</div>
+          <h4>Prompt injection</h4>
+          <p>Instrucciones maliciosas inyectadas vía referencias remotas o contenido cargado.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- ==========   NOVEDADES 2026     ============ -->
+    <!-- ============================================ -->
+
+    <!-- ========== 10. ESTÁNDAR ABIERTO ========== -->
+    <section id="estandar" data-search>
+      <h2><span class="h2-num">10</span> Estándar abierto: agentskills.io <span class="tag tag-new" style="margin-left:8px">NEW</span></h2>
+
+      <div class="callout callout-new">
+        <div class="callout-title">Diciembre 2025 · Anthropic libera el estándar</div>
+        <p>Anthropic publicó la especificación de Agent Skills como un <strong>estándar abierto</strong>,
+        gobernado en <a href="https://agentskills.io" target="_blank" rel="noopener">agentskills.io</a>,
+        siguiendo el mismo modelo que MCP. El formato <code>SKILL.md</code> es ahora
+        <strong>cross-platform</strong>: la misma Skill funciona en Claude, OpenAI Codex, Cursor,
+        GitHub Copilot, Gemini CLI y +20 plataformas adoptantes.</p>
+      </div>
+
+      <h3>Plataformas adoptantes</h3>
+      <div class="ecosystem">
+        <div class="eco-card"><span class="eco-emoji">⚡</span>Claude Code</div>
+        <div class="eco-card"><span class="eco-emoji">💬</span>Claude.ai</div>
+        <div class="eco-card"><span class="eco-emoji">🔌</span>Claude API</div>
+        <div class="eco-card"><span class="eco-emoji">🤖</span>OpenAI Codex</div>
+        <div class="eco-card"><span class="eco-emoji">💎</span>Gemini CLI</div>
+        <div class="eco-card"><span class="eco-emoji">🐙</span>GitHub Copilot</div>
+        <div class="eco-card"><span class="eco-emoji">⌨️</span>Cursor</div>
+        <div class="eco-card"><span class="eco-emoji">📝</span>VS Code</div>
+        <div class="eco-card"><span class="eco-emoji">☁️</span>Azure Agent SDK</div>
+        <div class="eco-card"><span class="eco-emoji">🎨</span>Canva</div>
+      </div>
+
+      <h3>Especificación oficial</h3>
+      <pre><code class="language-bash">skill-name/
+├── SKILL.md          # Requerido: metadata + instrucciones (YAML + Markdown)
+├── scripts/          # Opcional: código ejecutable
+├── references/       # Opcional: documentación
+├── assets/           # Opcional: plantillas, recursos
+└── ...               # Cualquier otro archivo o directorio</code></pre>
+
+      <p>La especificación completa está versionada en GitHub:
+      <a href="https://github.com/agentskills/agentskills" target="_blank" rel="noopener">github.com/agentskills/agentskills</a></p>
+    </section>
+
+    <!-- ========== 11. DREAMING ========== -->
+    <section id="dreaming" data-search>
+      <h2><span class="h2-num">11</span> Dreaming <span class="tag tag-preview" style="margin-left:8px">RESEARCH PREVIEW</span></h2>
+
+      <div class="callout callout-new">
+        <div class="callout-title">Code with Claude 2026 · Nueva capa de memoria activa</div>
+        <p><strong>Dreaming</strong> es un proceso programado que revisa las sesiones pasadas y los
+        stores de memoria del agente, extrae patrones y <strong>cura recuerdos</strong> para que
+        las Skills mejoren con el tiempo.</p>
+      </div>
+
+      <p>
+        Mientras una Skill normal es estática (instrucciones fijas en <code>SKILL.md</code>),
+        <strong>Dreaming permite consolidación pasiva</strong>: cuando el agente no está activo,
+        Claude analiza sus interacciones y refina patrones reutilizables, similar a cómo el cerebro
+        consolida memoria durante el sueño.
+      </p>
+
+      <h3>Cómo se integra con Skills</h3>
+      <div class="mermaid-wrap">
+        <div class="mermaid">
+flowchart TB
+  S1[Sesión 1] --> M[Memory Store]
+  S2[Sesión 2] --> M
+  S3[Sesión N] --> M
+  M -->|cron / scheduled| D[Proceso<br/>Dreaming]
+  D --> P[Extracción de<br/>patrones]
+  P --> SK[Skill curada<br/>con nuevos ejemplos]
+  SK --> A[Agente mejorado<br/>en próxima sesión]
+        </div>
+      </div>
+
+      <h3>Resultados publicados</h3>
+      <div class="hero-stats" style="margin-top:16px">
+        <div class="stat-card">
+          <div class="stat-value">6×</div>
+          <div class="stat-label">Mejora en task completion (Harvey · legal AI)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">∞</div>
+          <div class="stat-label">Memoria persistente entre sesiones</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">Cron</div>
+          <div class="stat-label">Ejecución programada (off-hours)</div>
+        </div>
+      </div>
+
+      <div class="callout callout-warn">
+        <div class="callout-title">Consideraciones de seguridad</div>
+        <p>Dreaming amplía la superficie de ataque: instrucciones maliciosas inyectadas en una sesión
+        pueden persistir en memoria curada. <strong>Audita los stores de memoria</strong> tan
+        cuidadosamente como el código de las Skills.</p>
+      </div>
+    </section>
+
+    <!-- ========== 12. OUTCOMES ========== -->
+    <section id="outcomes" data-search>
+      <h2><span class="h2-num">12</span> Outcomes <span class="tag tag-beta" style="margin-left:8px">PUBLIC BETA</span></h2>
+
+      <p>
+        <strong>Outcomes</strong> cambia el modelo de prompting: en lugar de instruir paso a paso,
+        defines una <strong>rúbrica de éxito</strong> y el agente itera contra un grader independiente
+        hasta cumplirla.
+      </p>
+
+      <h3>Patrón de uso con Skills</h3>
+      <pre><code class="language-yaml">---
+name: report-generator
+description: Generates executive reports following company style guide.
+outcome:
+  rubric: |
+    - Report contains executive summary (max 200 words)
+    - All numeric claims have source citations
+    - Tone is formal but accessible
+    - Visualizations include alt-text for accessibility
+  grader: claude-opus-4-7
+  max_iterations: 5
+---
+
+# Report Generator
+
+[Instrucciones procedimentales...]</code></pre>
+
+      <h3>Loop de iteración</h3>
+      <div class="mermaid-wrap">
+        <div class="mermaid">
+flowchart LR
+  P[Prompt + Skill] --> A[Agente<br/>genera output]
+  A --> G{Grader<br/>independiente<br/>evalúa rúbrica}
+  G -->|❌ Fallos| F[Feedback específico]
+  F --> A
+  G -->|✅ Pasa| O[Output final]
+        </div>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-title">Por qué es importante</div>
+        <p>El grader <strong>corre en su propio context window</strong> — no está contaminado por el
+        razonamiento del agente. Esto reduce el riesgo de auto-engaño y mejora la fiabilidad de
+        Skills sensibles a calidad (informes, código de producción, contenido legal).</p>
+      </div>
+    </section>
+
+    <!-- ========== 13. MULTI-AGENT ========== -->
+    <section id="multiagent" data-search>
+      <h2><span class="h2-num">13</span> Multi-Agent Orchestration <span class="tag tag-beta" style="margin-left:8px">PUBLIC BETA</span></h2>
+
+      <p>
+        Cuando una tarea excede lo que un solo agente puede manejar bien, un <strong>lead agent</strong>
+        descompone el trabajo y delega a especialistas — cada uno con su propio modelo, prompt y tools.
+      </p>
+
+      <h3>Caso real: investigación de incidencia</h3>
+      <div class="mermaid-wrap">
+        <div class="mermaid">
+flowchart TB
+  L[Lead Agent<br/>coordina investigación]
+  L --> S1[Sub-agente A<br/>deploy history]
+  L --> S2[Sub-agente B<br/>error logs]
+  L --> S3[Sub-agente C<br/>metrics dashboards]
+  L --> S4[Sub-agente D<br/>support tickets]
+  S1 --> FS[(Filesystem<br/>compartido)]
+  S2 --> FS
+  S3 --> FS
+  S4 --> FS
+  FS --> L
+  L --> R[Reporte de<br/>root cause]
+        </div>
+      </div>
+
+      <h3>Skills como bloques de orquestación</h3>
+      <p>
+        Cada sub-agente puede cargar Skills diferentes. Una <strong>Skill de orquestación</strong>
+        describe el patrón de delegación:
+      </p>
+      <pre><code class="language-yaml">---
+name: incident-investigation
+description: Coordinates a multi-agent investigation for production incidents.
+  Use when user reports an outage, anomaly, or unexplained system behavior.
+subagents:
+  - name: deploy-historian
+    skill: deploy-history-analysis
+  - name: log-detective
+    skill: error-log-triage
+  - name: metrics-analyst
+    skill: grafana-query
+shared_workspace: /tmp/incident-{{id}}/
+---</code></pre>
+
+      <h3>Managed Agents <span class="tag tag-new" style="margin-left:6px">NEW</span></h3>
+      <p>
+        Presentados en <strong>Code with Claude 2026</strong> (mayo, Londres) y reforzados en mayo–junio,
+        los <strong>Managed Agents</strong> son la materialización productizada de la orquestación
+        multi-agente. El usuario describe una especificación; el agente <em>elige tools, ejecuta extremo
+        a extremo y entrega un PR listo para mergear</em>.
+      </p>
+      <div class="callout callout-tip">
+        <div class="callout-title">Demo en vivo · Boris Cherny (Head of Claude Code)</div>
+        <p>En el keynote, Boris construyó en directo un <strong>dashboard de refunds</strong>
+        con idempotencia, soporte multi-divisa y audit logging — mostrando varias sesiones
+        de agente concurrentes con observabilidad en tiempo real y entrega de un PR mergeable.</p>
+      </div>
+      <h4>Diferencia clave frente a un sub-agente clásico</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Sub-agente</th><th>Managed Agent</th></tr></thead>
+          <tbody>
+            <tr><td>Lo invoca el lead agent dentro de tu sesión</td><td>Se lanza como tarea independiente con webhook de finalización</td></tr>
+            <tr><td>Compartes tu ventana de contexto y tools</td><td>Espacio de trabajo aislado, tools seleccionadas por la spec</td></tr>
+            <tr><td>El control queda contigo</td><td>Ejecución autónoma con <em>rúbrica</em> (Outcomes) y memoria persistente (Dreaming)</td></tr>
+            <tr><td>Output: respuesta en chat</td><td>Output: PR / artefacto + registro auditable</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:12px">
+        Las <strong>Skills</strong> siguen siendo el lenguaje común: una Managed Agent carga las Skills
+        relevantes para su dominio (refunds, migraciones, triaging) en lugar de re-empaquetar el
+        conocimiento procedimental en cada spec.
+      </p>
+    </section>
+
+    <!-- ========== 14. ADD-INS ========== -->
+    <section id="addins" data-search>
+      <h2><span class="h2-num">14</span> Add-ins y Plugins SDK <span class="tag tag-new" style="margin-left:8px">NEW</span></h2>
+
+      <p>
+        Los <strong>Add-ins</strong> permiten que Claude trabaje <strong>directamente dentro</strong>
+        de herramientas productivas (Notion, Figma, Atlassian, Canva, Slack) sin pasar por MCP o
+        connectors. Son el siguiente paso evolutivo de las Skills empaquetadas como plugins.
+      </p>
+
+      <h3>Novedades del Plugins SDK (mayo 2026)</h3>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon feature-icon-purple">📦</div>
+          <h4>Dependencias entre plugins</h4>
+          <p><code>claude plugin disable</code> rechaza la operación si otro plugin habilitado
+          depende del target, mostrando una cadena de desactivación copiable.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon feature-icon-cyan">💰</div>
+          <h4>Coste de contexto proyectado</h4>
+          <p>El pane <code>/plugin marketplace browse</code> muestra estimaciones de tokens
+          por turno y por invocación antes de instalar.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon feature-icon-blue">📎</div>
+          <h4>Carga desde .zip y URL</h4>
+          <p>El flag <code>--plugin-dir</code> acepta archivos <code>.zip</code> y el nuevo
+          <code>--plugin-url</code> descarga un archivo desde URL para la sesión actual.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon feature-icon-amber">🕒</div>
+          <h4>Última actualización visible</h4>
+          <p>Los panes <code>browse</code> y <code>discover</code> muestran cuándo fue actualizado
+          cada plugin — útil para identificar abandono.</p>
+        </div>
+      </div>
+
+      <h3>Manifest de plugin</h3>
+      <pre><code class="language-yaml"># .claude-plugin/plugin.json (manifest obligatorio)
+{
+  "name": "data-science-toolkit",
+  "version": "2.1.0",
+  "description": "Pandas, Polars, and visualization skills",
+  "skills": ["./skills/pandas-helpers", "./skills/plotting"],
+  "agents": ["./agents/eda-explorer.md"],
+  "hooks": [{"event": "pre-commit", "script": "./hooks/lint.sh"}],
+  "mcp_servers": [{"name": "duckdb", "command": "duckdb-mcp"}],
+  "dependencies": ["python-base@^1.0"]
+}</code></pre>
+
+      <h3>Comandos rápidos</h3>
+      <pre><code class="language-bash"># Probar un plugin desde una URL sin añadirlo permanentemente
+claude --plugin-url https://example.com/my-plugin.zip
+
+# Instalar desde archivo local zipeado
+claude --plugin-dir ./my-plugin.zip
+
+# Ver estimación de coste antes de instalar
+/plugin marketplace browse --show-cost</code></pre>
+    </section>
+
+    <!-- ========== 15. ENTERPRISE ========== -->
+    <section id="enterprise" data-search>
+      <h2><span class="h2-num">15</span> Enterprise &amp; Marketplaces <span class="tag tag-new" style="margin-left:8px">NEW</span></h2>
+
+      <h3>Gestión centralizada (Team / Enterprise)</h3>
+      <p>
+        Los administradores pueden <strong>provisionar Skills</strong> para toda la organización,
+        controlando qué workflows están disponibles, mientras los empleados conservan capacidad
+        de personalizar localmente.
+      </p>
+      <ul>
+        <li>Skills habilitadas/deshabilitadas <strong>por defecto</strong> a nivel org.</li>
+        <li>Auditoría centralizada de Skills instaladas y versiones.</li>
+        <li>Políticas de seguridad que restringen Skills de terceros.</li>
+      </ul>
+
+      <h3>Control granular de roles (mayo–junio 2026) <span class="tag tag-new" style="margin-left:6px">NEW</span></h3>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon feature-icon-purple">🔐</div>
+          <h4>Connector permissions en custom roles</h4>
+          <p>Los administradores Enterprise pueden definir <strong>qué connectors y tools</strong>
+          puede usar cada rol personalizado. Una Skill que invoca un connector vetado para el rol
+          se bloquea antes de ejecutarse — sin necesidad de re-escribir la Skill.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon feature-icon-cyan">👤</div>
+          <h4>Admin permissions en custom roles</h4>
+          <p>Desde el 2 de junio, los planes Enterprise permiten delegar tareas administrativas
+          (gestión de Skills, plugins, marketplaces) a roles que <em>no</em> son global admin —
+          útil para equipos de plataforma o seguridad.</p>
+        </div>
+      </div>
+
+      <h3>Claude Partner Network <span class="tag tag-new" style="margin-left:6px">NEW</span></h3>
+      <p>
+        Junto con las novedades enterprise, Anthropic ha publicado el <strong>Services Track</strong>
+        y el <strong>Claude Partner Hub</strong>: un catálogo donde los clientes encuentran partners
+        cualificados para implantación de Skills/Managed Agents, y donde las consultoras ven su
+        certificación, despliegues y siguientes pasos en el programa.
+      </p>
+
+      <h3>Skills prebuilt de partners</h3>
+      <div class="ecosystem">
+        <div class="eco-card"><span class="eco-emoji">🎨</span>Canva</div>
+        <div class="eco-card"><span class="eco-emoji">📝</span>Notion</div>
+        <div class="eco-card"><span class="eco-emoji">🖼️</span>Figma</div>
+        <div class="eco-card"><span class="eco-emoji">🟦</span>Atlassian</div>
+        <div class="eco-card"><span class="eco-emoji">💼</span>Claude Finance</div>
+        <div class="eco-card"><span class="eco-emoji">📊</span>Salesforce</div>
+      </div>
+
+      <h3>Marketplaces de la comunidad</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Marketplace</th><th>Contenido</th><th>Foco</th></tr></thead>
+          <tbody>
+            <tr><td><code>anthropics/skills</code></td><td>Skills oficiales</td><td>PowerPoint, Excel, Word, PDF</td></tr>
+            <tr><td><code>netresearch/claude-code-marketplace</code></td><td>Skills cross-platform</td><td>Portables a 30+ agentes</td></tr>
+            <tr><td><code>tonsofskills.com</code></td><td>425 plugins · 2.810 skills · 200 agentes</td><td>CLI <code>ccpi</code> como gestor</td></tr>
+            <tr><td>ClaudePluginHub</td><td>Catálogos curados por dominio</td><td>Discovery y rankings</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========== 16. SDK PYTHON ========== -->
+    <section id="sdk" data-search>
+      <h2><span class="h2-num">16</span> Python SDK &amp; portabilidad <span class="tag tag-new" style="margin-left:8px">NEW</span></h2>
+
+      <p>
+        El <strong>Agent Skills SDK</strong> es la implementación de referencia en Python,
+        diseñada para tratar Skills como <em>unidades abstractas de expertise</em>
+        consumibles por cualquier framework de agentes.
+      </p>
+
+      <h3>Capacidades del SDK</h3>
+      <ul>
+        <li><strong>Carga programática</strong>: descubrir Skills desde directorios, URLs o packages.</li>
+        <li><strong>Validación</strong>: chequear que <code>SKILL.md</code> cumple el estándar.</li>
+        <li><strong>Ejecución</strong>: invocar Skills desde código, con o sin agente.</li>
+        <li><strong>Storage abstraction</strong>: locales, S3, GCS, repos git, registries privados.</li>
+      </ul>
+
+      <h3>Ejemplo de uso</h3>
+      <pre><code class="language-python">from agent_skills import SkillRegistry, Skill
+
+# Cargar Skills desde múltiples fuentes
+registry = SkillRegistry()
+registry.load_from_path("~/.claude/skills/")
+registry.load_from_git("github.com/anthropics/skills")
+registry.load_from_url("https://my-cdn/team-skills.zip")
+
+# Descubrir Skills relevantes para una tarea
+matches = registry.discover(
+    task="Generar un dashboard de ventas mensual",
+    top_k=3,
+)
+for skill in matches:
+    print(f"{skill.name}: {skill.description[:80]}...")
+
+# Ejecutar una Skill específica con tu agente preferido
+result = registry.invoke(
+    skill_name="dashboard-builder",
+    inputs={"data_source": "sales.csv", "period": "monthly"},
+    agent_backend="claude-opus-4-7",  # o "gpt-4", "gemini", etc.
+)</code></pre>
+
+      <h3>Portabilidad cross-platform</h3>
+      <div class="callout callout-info">
+        <div class="callout-title">Una Skill, múltiples agentes</div>
+        <p>El mismo <code>SKILL.md</code> que escribes para Claude funciona en Codex (OpenAI),
+        Cursor, Gemini CLI y +20 plataformas adoptantes. <strong>Cero vendor lock-in</strong>
+        a nivel de conocimiento procedimental.</p>
+      </div>
+
+      <div class="mermaid-wrap">
+        <div class="mermaid">
+flowchart LR
+  SK[SKILL.md] --> P1[Claude Code]
+  SK --> P2[Claude API]
+  SK --> P3[OpenAI Codex]
+  SK --> P4[Cursor]
+  SK --> P5[Gemini CLI]
+  SK --> P6[Copilot]
+  SK --> P7[Custom Agent<br/>via SDK]
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 17. NOVEDADES JUNIO 2026 ========== -->
+    <section id="junio2026" data-search>
+      <h2><span class="h2-num">17</span> Novedades junio 2026 <span class="tag tag-new" style="margin-left:8px">JUST IN</span></h2>
+
+      <p>
+        Entre el cierre de <em>Code with Claude 2026</em> y el inicio de junio, Anthropic ha publicado
+        una tanda de mejoras incrementales que tocan de lleno el día a día de quien escribe Skills.
+        Esta es la lista cerrada a <strong>7 de junio de 2026</strong>.
+      </p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon feature-icon-purple">♻️</div>
+          <h4><code>/reload-skills</code></h4>
+          <p>Claude Code <strong>v2.1.157</strong> (31 mayo) introduce un comando que re-escanea
+          los directorios de Skills <em>sin reiniciar la sesión</em>. Iterar sobre una Skill ya no
+          obliga a abrir un Claude nuevo.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon feature-icon-cyan">🪝</div>
+          <h4><code>SessionStart → reloadSkills: true</code></h4>
+          <p>Un hook de <code>SessionStart</code> que instale una Skill al arrancar puede ahora
+          devolver <code>{ "reloadSkills": true }</code>. Claude la recarga y queda disponible
+          <strong>en la misma sesión</strong>.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon feature-icon-blue">📂</div>
+          <h4>Auto-load de <code>.claude/skills/</code></h4>
+          <p>Los plugins ubicados en <code>.claude/skills/</code> se cargan automáticamente,
+          <strong>sin necesidad de marketplace</strong>. Además, <code>claude plugin init</code>
+          hace el scaffolding inicial de un plugin nuevo.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon feature-icon-amber">🚫</div>
+          <h4><code>disallowed-tools</code> en frontmatter</h4>
+          <p>Skills y commands pueden listar tools <em>vetadas mientras están activas</em>.
+          Útil para sandbox: una Skill de revisión puede deshabilitar <code>Bash</code>
+          aunque el usuario lo tenga permitido a nivel global.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon feature-icon-purple">🎛️</div>
+          <h4><code>defaultEnabled: false</code></h4>
+          <p>Un plugin puede declararse en <code>plugin.json</code> o en la entrada del marketplace
+          como <em>instalado pero desactivado por defecto</em>. Reduce ruido en organizaciones
+          con catálogos grandes.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon feature-icon-cyan">🧠</div>
+          <h4>Claude Opus 4.8 (28 mayo)</h4>
+          <p>Mejora explícita en <strong>agentic skills</strong>, coding, razonamiento y trabajo
+          práctico de conocimiento respecto a Opus 4.7. Cabecera API: <code>claude-opus-4-8</code>.</p>
+        </div>
+      </div>
+
+      <div class="callout callout-warn" style="margin-top:24px">
+        <div class="callout-title">📅 Facturación separada del Agent SDK desde 15 de junio 2026</div>
+        <p>A partir del <strong>15 de junio de 2026</strong>, el uso del <strong>Claude Agent SDK</strong>
+        y de las <strong>Claude Code GitHub Actions</strong> se factura <em>separadamente</em>
+        del Claude Code interactivo. Si distribuyes Skills empaquetadas para correr en CI/CD
+        o vía SDK propio, revisa tu telemetría antes de la fecha de corte.</p>
+      </div>
+
+      <h3>Ejemplo: hook que instala una Skill al arrancar</h3>
+      <pre><code class="language-json">{
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "scripts/install-team-skill.sh && echo '{\"reloadSkills\": true}'"
+      }
+    ]
+  }
+}</code></pre>
+      <p>
+        Con <code>reloadSkills: true</code>, la Skill clonada por <code>install-team-skill.sh</code>
+        entra en el índice <em>antes</em> del primer prompt del usuario — sin recargar Claude.
+      </p>
+
+      <h3>Ejemplo: Skill que bloquea Bash mientras está activa</h3>
+      <pre><code class="language-yaml">---
+name: code-review-strict
+description: Revisión adversarial de un diff sin permitir ejecutar nada.
+  Use cuando el usuario pida "revisa este PR sin tocar el código".
+disallowed-tools:
+  - Bash
+  - Write
+  - Edit
+---
+
+Eres un revisor estricto: solo puedes leer (Read, Grep, Glob) y razonar.
+Nunca propongas un comando — explica qué falla y deja el fix al humano.</code></pre>
+    </section>
+
+    <!-- ========== 18. ROADMAP ========== -->
+    <section id="roadmap" data-search>
+      <h2><span class="h2-num">18</span> Roadmap y timeline</h2>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-date">OCT 2025</div>
+          <div class="timeline-title">Lanzamiento inicial de Agent Skills</div>
+          <div class="timeline-desc">Anthropic introduce Skills en Claude.ai y Claude Code con progressive disclosure y skills prebuilt para Office (pptx, xlsx, docx, pdf).</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">DIC 2025</div>
+          <div class="timeline-title">Estándar abierto en agentskills.io</div>
+          <div class="timeline-desc">Anthropic libera la especificación como estándar cross-platform. OpenAI adopta el formato para Codex CLI y ChatGPT.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">ENE 2026</div>
+          <div class="timeline-title">Enterprise Management</div>
+          <div class="timeline-desc">Provisión centralizada de Skills para planes Team y Enterprise. Skills prebuilt de Canva, Notion, Figma, Atlassian.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">MAR 2026</div>
+          <div class="timeline-title">Python SDK v1.0</div>
+          <div class="timeline-desc">Implementación de referencia open-source. Cualquier framework de agentes puede consumir Skills.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">MAY 2026</div>
+          <div class="timeline-title">Code with Claude 2026</div>
+          <div class="timeline-desc">Anuncio de Dreaming, Outcomes, Multi-Agent Orchestration, Add-ins y Claude Finance con 10 agentes prebuilt. Boris Cherny demo en vivo de Managed Agents construyendo un dashboard de refunds.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">MAY 28 · 2026</div>
+          <div class="timeline-title">Claude Opus 4.8 + connector permissions</div>
+          <div class="timeline-desc">Mejor desempeño en agentic skills frente a Opus 4.7. Enterprise: control de connectors por custom role.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">MAY 31 · 2026</div>
+          <div class="timeline-title">Claude Code v2.1.157</div>
+          <div class="timeline-desc">Comando <code>/reload-skills</code>, hook <code>reloadSkills: true</code> en <code>SessionStart</code>, auto-load de <code>.claude/skills/</code>, <code>disallowed-tools</code> en frontmatter, <code>defaultEnabled: false</code> en plugins.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">JUN 15 · 2026</div>
+          <div class="timeline-title">Facturación separada del Agent SDK</div>
+          <div class="timeline-desc">Claude Agent SDK y Claude Code GitHub Actions pasan a métrica de facturación independiente del Claude Code interactivo.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">PRÓXIMO</div>
+          <div class="timeline-title">GA de Outcomes y Multi-Agent</div>
+          <div class="timeline-desc">Salida de beta pública y mejoras de observabilidad para orquestación multi-agente.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== CHEATSHEET ========== -->
+    <section id="cheatsheet" data-search>
+      <h2><span class="h2-num">∑</span> Cheatsheet rápido</h2>
+
+      <pre><code class="language-bash">┌─────────────────────────────────────────────────┐
+│           CREAR UNA SKILL EN 4 PASOS            │
+├─────────────────────────────────────────────────┤
+│ 1. Crear directorio:                            │
+│    mkdir ~/.claude/skills/mi-skill/             │
+│                                                 │
+│ 2. Crear SKILL.md con:                          │
+│    --- (frontmatter YAML)                       │
+│    name: mi-skill                               │
+│    description: Qué hace y CUÁNDO usarla        │
+│    ---                                          │
+│    # Instrucciones en Markdown                  │
+│                                                 │
+│ 3. Probar:                                      │
+│    - Automático: pregunta relevante             │
+│    - Directo: /mi-skill                         │
+│                                                 │
+│ 4. Iterar:                                      │
+│    - ¿No se activa? → description más asertiva  │
+│    - ¿Output malo?  → instrucciones más claras  │
+│    - ¿Muy larga?    → dividir en archivos       │
+│    - ¿Inconsistente?→ añadir rúbrica (Outcomes) │
+└─────────────────────────────────────────────────┘</code></pre>
+
+      <h3>Comandos esenciales</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Comando</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>/mi-skill</code></td><td>Invocar Skill directamente (si <code>user-invocable</code>)</td></tr>
+            <tr><td><code>/plugin marketplace add &lt;repo&gt;</code></td><td>Añadir un marketplace</td></tr>
+            <tr><td><code>/plugin add &lt;path&gt;</code></td><td>Instalar plugin local</td></tr>
+            <tr><td><code>claude --plugin-url &lt;url&gt;</code></td><td>Probar plugin desde URL (sesión)</td></tr>
+            <tr><td><code>claude --plugin-dir &lt;path|zip&gt;</code></td><td>Cargar plugin desde dir o zip</td></tr>
+            <tr><td><code>claude plugin disable &lt;name&gt;</code></td><td>Desactivar con chequeo de dependencias</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========== REFERENCIAS ========== -->
+    <section id="referencias" data-search>
+      <h2><span class="h2-num">📚</span> Referencias</h2>
+
+      <h3>Documentación oficial</h3>
+      <ul>
+        <li><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview" target="_blank" rel="noopener">Agent Skills Overview (Anthropic)</a></li>
+        <li><a href="https://code.claude.com/docs/en/skills" target="_blank" rel="noopener">Skills en Claude Code</a></li>
+        <li><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices" target="_blank" rel="noopener">Best Practices oficiales</a></li>
+        <li><a href="https://platform.claude.com/docs/en/agent-sdk/plugins" target="_blank" rel="noopener">Plugins in the SDK</a></li>
+      </ul>
+
+      <h3>Estándar abierto</h3>
+      <ul>
+        <li><a href="https://agentskills.io" target="_blank" rel="noopener">agentskills.io</a> — Sitio oficial del estándar</li>
+        <li><a href="https://agentskills.io/specification" target="_blank" rel="noopener">Especificación completa</a></li>
+        <li><a href="https://github.com/agentskills/agentskills" target="_blank" rel="noopener">Repositorio GitHub (spec + SDK Python)</a></li>
+      </ul>
+
+      <h3>Novedades 2026</h3>
+      <ul>
+        <li><a href="https://claude.com/blog/new-in-claude-managed-agents" target="_blank" rel="noopener">Dreaming, Outcomes y Multi-Agent Orchestration (Anthropic)</a></li>
+        <li><a href="https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills" target="_blank" rel="noopener">Engineering: Equipping agents for the real world</a></li>
+        <li><a href="https://developers.openai.com/codex/skills" target="_blank" rel="noopener">Agent Skills en OpenAI Codex</a></li>
+      </ul>
+
+      <h3>Marketplaces y comunidad</h3>
+      <ul>
+        <li><a href="https://github.com/anthropics/skills" target="_blank" rel="noopener">Repositorio público de Skills (Anthropic)</a></li>
+        <li><a href="https://github.com/netresearch/claude-code-marketplace" target="_blank" rel="noopener">netresearch/claude-code-marketplace</a></li>
+        <li><a href="https://www.claudepluginhub.com" target="_blank" rel="noopener">ClaudePluginHub</a></li>
+        <li><a href="https://claudemarketplaces.com" target="_blank" rel="noopener">claudemarketplaces.com</a></li>
+      </ul>
+
+      <h3>Formación</h3>
+      <ul>
+        <li><a href="https://anthropic.skilljar.com/introduction-to-agent-skills" target="_blank" rel="noopener">Curso: Introduction to Agent Skills (Anthropic Academy)</a></li>
+        <li><a href="https://support.claude.com/en/articles/12512176-what-are-skills" target="_blank" rel="noopener">Centro de ayuda: What are Skills?</a></li>
+      </ul>
+    </section>
+
+    <footer>
+      <div class="footer-grid">
+        <div>
+          <h5>Sobre esta guía</h5>
+          <p style="font-size:13px;line-height:1.6">
+            Edición 2026 actualizada con las novedades anunciadas en Code with Claude 2026,
+            las últimas releases de Claude Code (mayo–junio 2026), Opus 4.8 y el estándar
+            abierto agentskills.io. Material didáctico para cursos universitarios de IA y Big Data.
+          </p>
+        </div>
+        <div>
+          <h5>Fuentes principales</h5>
+          <ul>
+            <li><a href="https://www.anthropic.com" target="_blank" rel="noopener">Anthropic</a></li>
+            <li><a href="https://agentskills.io" target="_blank" rel="noopener">agentskills.io</a></li>
+            <li><a href="https://claude.com/blog/new-in-claude-managed-agents" target="_blank" rel="noopener">Claude Blog</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5>Curso ML2 Online</h5>
+          <ul>
+            <li>Unidad 4 · n8n y Agentes IA</li>
+            <li>Unidad 5 · Skills avanzadas</li>
+            <li>Unidad 6 · Orquestación multi-agente</li>
+          </ul>
+        </div>
+      </div>
+      <p style="text-align:center;padding-top:24px;border-top:1px solid var(--color-border);font-size:12px">
+        Generado a partir de <code>agent-skills-guia-completa.md</code> · Actualizado a junio 2026 (v2026.06)
+        · <a href="https://agentskills.io" target="_blank" rel="noopener">agentskills.io</a>
+      </p>
+    </footer>
+
+  </main>
+</div>
+
+<button class="fab" id="backToTop" aria-label="Volver arriba">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+// ----- Highlight.js -----
+hljs.highlightAll();
+
+// ----- Mermaid -----
+mermaid.initialize({
+  startOnLoad: true,
+  theme: 'dark',
+  themeVariables: {
+    primaryColor: '#d97757',
+    primaryTextColor: '#e6e9f0',
+    primaryBorderColor: '#d97757',
+    lineColor: '#6b7280',
+    secondaryColor: '#1d2230',
+    tertiaryColor: '#161a24',
+    background: '#161a24',
+    mainBkg: '#1d2230',
+    nodeBorder: '#2c3344',
+    clusterBkg: '#11141c',
+    clusterBorder: '#232938',
+    edgeLabelBackground: '#161a24',
+    fontFamily: 'Inter, sans-serif'
+  }
+});
+
+// ----- Theme toggle -----
+const themeBtn = document.getElementById('themeToggle');
+const moonIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+const sunIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+
+themeBtn.addEventListener('click', () => {
+  const isLight = document.body.dataset.theme === 'light';
+  document.body.dataset.theme = isLight ? 'dark' : 'light';
+  themeBtn.innerHTML = isLight ? moonIcon : sunIcon;
+  localStorage.setItem('skills-guide-theme', document.body.dataset.theme);
+
+  // Reload mermaid with appropriate theme
+  const newTheme = isLight ? 'default' : 'dark';
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: newTheme,
+    themeVariables: isLight ? {
+      primaryColor: '#d97757',
+      primaryTextColor: '#1a1815',
+      lineColor: '#8a877e',
+      fontFamily: 'Inter, sans-serif'
+    } : {
+      primaryColor: '#d97757',
+      primaryTextColor: '#e6e9f0',
+      lineColor: '#6b7280',
+      fontFamily: 'Inter, sans-serif'
+    }
+  });
+  // Re-render mermaid diagrams
+  document.querySelectorAll('.mermaid').forEach(el => {
+    const src = el.getAttribute('data-src') || el.textContent;
+    if (!el.getAttribute('data-src')) el.setAttribute('data-src', src);
+    el.removeAttribute('data-processed');
+    el.innerHTML = src;
+  });
+  mermaid.run();
+});
+
+const savedTheme = localStorage.getItem('skills-guide-theme');
+if (savedTheme === 'light') {
+  document.body.dataset.theme = 'light';
+  themeBtn.innerHTML = sunIcon;
+}
+
+// ----- Sidebar mobile toggle -----
+document.getElementById('menuToggle').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('open');
+});
+document.querySelectorAll('.toc a').forEach(a => {
+  a.addEventListener('click', () => {
+    document.getElementById('sidebar').classList.remove('open');
+  });
+});
+
+// ----- Active TOC link on scroll -----
+const tocLinks = document.querySelectorAll('.toc a');
+const sections = document.querySelectorAll('section[id]');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      tocLinks.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+      });
+    }
+  });
+}, { rootMargin: '-30% 0px -60% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// ----- Tabs -----
+document.querySelectorAll('.tabs').forEach(tabContainer => {
+  const btns = tabContainer.querySelectorAll('.tab-btn');
+  const contents = tabContainer.querySelectorAll('.tab-content');
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.tab;
+      btns.forEach(b => b.classList.toggle('active', b === btn));
+      contents.forEach(c => c.classList.toggle('active', c.dataset.tab === target));
+    });
+  });
+});
+
+// ----- Copy buttons -----
+document.querySelectorAll('pre').forEach(pre => {
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.setAttribute('aria-label', 'Copiar código');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+  btn.addEventListener('click', async () => {
+    const code = pre.querySelector('code')?.textContent || pre.textContent;
+    try {
+      await navigator.clipboard.writeText(code);
+      btn.classList.add('copied');
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+      }, 1800);
+    } catch (e) {}
+  });
+  pre.appendChild(btn);
+});
+
+// ----- Search -----
+const searchInput = document.getElementById('searchInput');
+const searchEmpty = document.getElementById('searchEmpty');
+const searchableSections = document.querySelectorAll('section[data-search]');
+
+searchInput.addEventListener('input', (e) => {
+  const q = e.target.value.trim().toLowerCase();
+  let visibleCount = 0;
+  searchableSections.forEach(section => {
+    if (!q) {
+      section.classList.remove('hidden-by-search');
+      visibleCount++;
+      return;
+    }
+    const text = section.textContent.toLowerCase();
+    const match = text.includes(q);
+    section.classList.toggle('hidden-by-search', !match);
+    if (match) visibleCount++;
+  });
+  searchEmpty.style.display = (q && visibleCount === 0) ? 'block' : 'none';
+});
+
+// ----- Progress bar + back to top -----
+const progressBar = document.getElementById('progressBar');
+const backToTop = document.getElementById('backToTop');
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const scrolled = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+  progressBar.style.width = scrolled + '%';
+  backToTop.classList.toggle('visible', h.scrollTop > 600);
+});
+backToTop.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+</script>
+
+</body>
+</html>
