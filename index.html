@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Agent Skills · Guía Avanzada 2026</title>
-<meta name="description" content="Guía completa y avanzada sobre Agent Skills de Anthropic/Claude. Incluye las novedades de 2026: Dreaming, Outcomes, Multi-Agent Orchestration, Managed Agents, Add-ins, el estándar abierto agentskills.io y las últimas mejoras de junio (/reload-skills, Opus 4.8, plugins auto-load).">
+<meta name="description" content="Guía completa y avanzada sobre Agent Skills de Anthropic/Claude. Incluye las novedades de 2026: Dreaming, Outcomes, Multi-Agent Orchestration, Managed Agents, el Plugins SDK, skills-ref, el estándar abierto agentskills.io y las últimas mejoras de mayo-junio (/reload-skills, Opus 4.8, plugins auto-load).">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -870,6 +870,27 @@ footer {
 }
 .menu-toggle { display: none; }
 
+/* ---------- PRINT ---------- */
+@media print {
+  .topbar, .sidebar, .fab, .progress-bar, .copy-btn, .search-box { display: none !important; }
+  body { background: white !important; color: #1a1815 !important; font-size: 12px; }
+  .layout { display: block; margin-top: 0; }
+  .main { padding: 0; max-width: 100%; }
+  .hero::before { display: none; }
+  .hero h1 { -webkit-text-fill-color: #1a1815; background: none; }
+  section { break-inside: avoid-page; margin-bottom: 32px; }
+  .stat-card, .feature-card, .level-card, .callout, .table-wrap, .eco-card, .compare-card, .mermaid-wrap {
+    background: white !important; border-color: #ccc !important; box-shadow: none !important;
+  }
+  section p, section li, .callout p, .feature-card p, .timeline-desc, .stat-label,
+  .level-card p, .compare-card, .hero-sub { color: #333 !important; }
+  pre { background: #f5f5f2 !important; border-color: #ccc; }
+  pre code, pre code * { color: #1a1815 !important; }
+  a { color: #b85d3f; border-bottom: none; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 10px; color: #888; }
+  .toc a::after { content: none; }
+}
+
 </style>
 </head>
 <body data-theme="dark">
@@ -889,7 +910,7 @@ footer {
   </div>
   <div class="topbar-spacer"></div>
   <div class="search-box">
-    <input type="text" id="searchInput" placeholder="Buscar en la guía..." aria-label="Buscar">
+    <input type="text" id="searchInput" placeholder="Buscar en la guía…  ( / )" aria-label="Buscar">
   </div>
   <button class="iconbtn" id="themeToggle" aria-label="Cambiar tema" title="Cambiar tema">
     <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -919,9 +940,9 @@ footer {
         <li><a href="#dreaming"><span class="toc-num">11</span><span>Dreaming</span><span class="badge-new">NEW</span></a></li>
         <li><a href="#outcomes"><span class="toc-num">12</span><span>Outcomes</span><span class="badge-new">NEW</span></a></li>
         <li><a href="#multiagent"><span class="toc-num">13</span><span>Multi-agent Orchestration</span><span class="badge-new">NEW</span></a></li>
-        <li><a href="#addins"><span class="toc-num">14</span><span>Add-ins y Plugins SDK</span><span class="badge-new">NEW</span></a></li>
+        <li><a href="#addins"><span class="toc-num">14</span><span>Plugins SDK y ecosistema</span><span class="badge-new">NEW</span></a></li>
         <li><a href="#enterprise"><span class="toc-num">15</span><span>Enterprise &amp; Marketplaces</span><span class="badge-new">NEW</span></a></li>
-        <li><a href="#sdk"><span class="toc-num">16</span><span>Python SDK &amp; portabilidad</span><span class="badge-new">NEW</span></a></li>
+        <li><a href="#sdk"><span class="toc-num">16</span><span>skills-ref &amp; portabilidad</span><span class="badge-new">NEW</span></a></li>
         <li><a href="#junio2026"><span class="toc-num">17</span><span>Novedades junio 2026</span><span class="badge-new">NEW</span></a></li>
         <li><a href="#roadmap"><span class="toc-num">18</span><span>Roadmap y timeline</span></a></li>
       </ul>
@@ -939,14 +960,14 @@ footer {
   <main class="main">
 
     <div class="hero">
-      <div class="hero-tag">Edición 2026 · Actualizada</div>
+      <div class="hero-tag">Edición 2026 · Verificada a 11 de junio</div>
       <h1>Agent Skills: Guía avanzada para agentes IA</h1>
       <p class="hero-sub">
         Aprende a construir, distribuir y aprovechar las <strong>Agent Skills</strong> de Claude.
         Esta edición incluye <strong>Dreaming</strong>, <strong>Outcomes</strong>,
-        <strong>Multi-Agent Orchestration</strong>, <strong>Managed Agents</strong>, <strong>Add-ins</strong>,
-        el SDK Python y las últimas mejoras de junio 2026 — <code>/reload-skills</code>,
-        <strong>Opus 4.8</strong> y el estándar abierto
+        <strong>Multi-Agent Orchestration</strong>, <strong>Managed Agents</strong>, el <strong>Plugins SDK</strong>,
+        la librería de referencia <code>skills-ref</code> y las últimas mejoras de mayo–junio 2026 —
+        <code>/reload-skills</code>, <strong>Opus 4.8</strong> y el estándar abierto
         <a href="https://agentskills.io" target="_blank" rel="noopener">agentskills.io</a>.
       </p>
       <div class="hero-stats">
@@ -959,8 +980,8 @@ footer {
           <div class="stat-label">Niveles de carga progresiva</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value">30+</div>
-          <div class="stat-label">Plataformas compatibles</div>
+          <div class="stat-value">40+</div>
+          <div class="stat-label">Herramientas adoptantes (showcase oficial)</div>
         </div>
         <div class="stat-card">
           <div class="stat-value">6×</div>
@@ -1101,19 +1122,32 @@ When explaining code, always include:
 
 Keep explanations conversational. For complex concepts, use multiple analogies.</code></pre>
 
-      <h3>Campos del frontmatter</h3>
+      <h3>Campos del frontmatter (estándar abierto)</h3>
       <div class="table-wrap">
         <table>
           <thead>
             <tr><th>Campo</th><th>Requerido</th><th>Restricciones</th></tr>
           </thead>
           <tbody>
-            <tr><td><code>name</code></td><td>Sí</td><td>Máx 64 chars · solo minúsculas/números/guiones · sin tags XML · sin palabras reservadas ("anthropic", "claude")</td></tr>
-            <tr><td><code>description</code></td><td>Sí</td><td>Máx 1024 chars · no vacío · sin tags XML</td></tr>
-            <tr><td><code>disable-model-invocation</code></td><td>No</td><td><code>true</code> = solo el usuario puede invocar</td></tr>
-            <tr><td><code>user-invocable</code></td><td>No</td><td><code>false</code> = solo Claude puede invocar automáticamente</td></tr>
+            <tr><td><code>name</code></td><td>Sí</td><td>Máx 64 chars · solo minúsculas/números/guiones · sin guiones al inicio/fin ni dobles (<code>--</code>) · debe coincidir con el nombre del directorio</td></tr>
+            <tr><td><code>description</code></td><td>Sí</td><td>Máx 1024 chars · no vacío · describe qué hace la skill y <em>cuándo</em> usarla</td></tr>
+            <tr><td><code>license</code></td><td>No</td><td>Nombre de licencia o referencia a archivo de licencia incluido</td></tr>
+            <tr><td><code>compatibility</code></td><td>No</td><td>Máx 500 chars · requisitos de entorno (producto, paquetes de sistema, red…)</td></tr>
+            <tr><td><code>metadata</code></td><td>No</td><td>Mapa clave-valor arbitrario (autor, versión…)</td></tr>
+            <tr><td><code>allowed-tools</code></td><td>No</td><td>Tools pre-aprobadas, separadas por espacios · <em>experimental</em></td></tr>
           </tbody>
         </table>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Claude Code relaja el estándar</div>
+        <p>En Claude Code <strong>todos los campos son opcionales</strong>: <code>name</code> es solo el
+        nombre de visualización (el comando sale del nombre del directorio) y <code>description</code>
+        es lo único recomendado para la invocación automática. Además, los archivos de
+        <code>.claude/commands/</code> se han <strong>fusionado con las skills</strong>: un
+        <code>commands/deploy.md</code> y un <code>skills/deploy/SKILL.md</code> crean el mismo
+        <code>/deploy</code>. Los campos extra de Claude Code (<code>disable-model-invocation</code>,
+        <code>context: fork</code>, <code>disallowed-tools</code>…) se ven en la sección 4.</p>
       </div>
 
       <h3>Dónde almacenar las Skills</h3>
@@ -1131,25 +1165,38 @@ cd ~/.claude/skills/mi-skill
 touch SKILL.md</code></pre>
         </div>
         <div class="tab-content" data-tab="cai">
-          <p>Se suben como archivos <code>.zip</code> desde <strong>Settings → Features</strong>.</p>
+          <p>Se suben como archivos <code>.zip</code> desde <strong>Ajustes → Capacidades</strong> (Settings → Capabilities).</p>
           <pre><code class="language-bash">cd mi-skill/
 zip -r mi-skill.zip .
 # Subir mi-skill.zip desde Claude.ai</code></pre>
         </div>
         <div class="tab-content" data-tab="api">
-          <p>Gestión mediante endpoints REST en <code>/v1/skills</code>.</p>
+          <p>Gestión mediante la <strong>Skills API</strong> (beta) en <code>/v1/skills</code>.
+          Las skills subidas se comparten a nivel de <strong>workspace</strong>.</p>
           <pre><code class="language-bash">curl -X POST https://api.anthropic.com/v1/skills \
   -H "x-api-key: $ANTHROPIC_API_KEY" \
-  -H "anthropic-version: 2026-01-01" \
-  -F "skill=@mi-skill.zip"</code></pre>
+  -H "anthropic-version: 2023-06-01" \
+  -H "anthropic-beta: skills-2025-10-02" \
+  -F "files[]=@mi-skill/SKILL.md;filename=mi-skill/SKILL.md" \
+  -F "display_title=Mi Skill"
+# El SDK de Python incluye el helper files_from_dir("mi-skill/")</code></pre>
         </div>
       </div>
 
       <h3>Probando la Skill</h3>
       <ol>
         <li><strong>Invocación automática</strong>: pregunta algo que coincida con la <code>description</code>.</li>
-        <li><strong>Invocación directa</strong>: usa el comando <code>/explain-code</code> (el <code>name</code> se convierte en slash command).</li>
+        <li><strong>Invocación directa</strong>: usa el comando <code>/explain-code</code> (el nombre del directorio se convierte en slash command).</li>
       </ol>
+
+      <div class="callout callout-tip">
+        <div class="callout-title">Iteración sin reiniciar</div>
+        <p>Claude Code <strong>vigila los directorios de skills</strong>: editar un <code>SKILL.md</code>
+        en <code>~/.claude/skills/</code> o <code>.claude/skills/</code> surte efecto en la sesión
+        actual sin reiniciar. Para forzar un re-escaneo completo existe además
+        <code>/reload-skills</code> (v2.1.157+). Pregunta <em>"What skills are available?"</em>
+        para comprobar qué skills ve Claude.</p>
+      </div>
     </section>
 
     <!-- ========== 4. AVANZADO ========== -->
@@ -1168,6 +1215,51 @@ name: legacy-system-context
 description: Context about our legacy payment system architecture.
 user-invocable: false  # Solo Claude puede invocar automáticamente
 ---</code></pre>
+
+      <h3>Campos extra de Claude Code (frontmatter)</h3>
+      <p>Además de los campos del estándar, Claude Code añade extensiones propias:</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Campo</th><th>Qué hace</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>when_to_use</code></td><td>Contexto adicional de activación (frases trigger); se añade a la <code>description</code></td></tr>
+            <tr><td><code>argument-hint</code> / <code>arguments</code></td><td>Pista de autocompletado y argumentos posicionales con nombre (<code>$issue</code>, <code>$0</code>, <code>$ARGUMENTS</code>)</td></tr>
+            <tr><td><code>allowed-tools</code></td><td>Tools pre-aprobadas (sin pedir permiso) mientras la skill está activa</td></tr>
+            <tr><td><code>disallowed-tools</code></td><td>Tools <em>retiradas</em> del modelo mientras la skill está activa (sandbox por skill)</td></tr>
+            <tr><td><code>model</code> / <code>effort</code></td><td>Modelo y nivel de esfuerzo (<code>low</code>…<code>max</code>) a usar durante el turno de la skill</td></tr>
+            <tr><td><code>context: fork</code> + <code>agent</code></td><td>Ejecuta la skill en un subagente aislado (<code>Explore</code>, <code>Plan</code>, <code>general-purpose</code> o custom)</td></tr>
+            <tr><td><code>paths</code></td><td>Globs que limitan la activación automática a ciertos archivos (ideal para monorepos)</td></tr>
+            <tr><td><code>hooks</code></td><td>Hooks acotados al ciclo de vida de la skill</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Inyección dinámica de contexto</h3>
+      <p>
+        La sintaxis <code>!`comando`</code> ejecuta un comando shell <strong>antes</strong> de enviar
+        la skill al modelo y sustituye el placeholder por su salida. Claude recibe datos reales,
+        no el comando:
+      </p>
+      <pre><code class="language-yaml">---
+name: summarize-changes
+description: Resume los cambios sin commitear y señala riesgos. Use when the
+  user asks what changed or wants a commit message.
+---
+
+## Cambios actuales
+
+!`git diff HEAD`
+
+## Instrucciones
+
+Resume los cambios de arriba en 2-3 bullets y lista riesgos detectados.</code></pre>
+      <p>
+        También hay sustituciones de cadena: <code>$ARGUMENTS</code> (todo lo tecleado tras el comando),
+        <code>$0</code>, <code>$1</code>… (posicionales), <code>${CLAUDE_SKILL_DIR}</code> (directorio de
+        la skill, para referenciar scripts empaquetados) y <code>${CLAUDE_SESSION_ID}</code>.
+      </p>
 
       <h3>Skill multi-archivo</h3>
       <pre><code class="language-bash">mi-skill-avanzada/
@@ -1279,12 +1371,16 @@ flowchart LR
 ├── src/
 └── package.json</code></pre>
 
-      <h3>Nivel organizacional: Plugins</h3>
-      <pre><code class="language-bash"># Instalar desde el marketplace de Skills
+      <h3>Nivel organizacional: Plugins y marketplaces</h3>
+      <pre><code class="language-bash"># Añadir un marketplace (claude-plugins-official viene registrado de serie)
 /plugin marketplace add anthropics/skills
 
-# Instalar desde un directorio local
-/plugin add /path/to/skill-directory</code></pre>
+# Instalar un plugin desde un marketplace
+/plugin install nombre-plugin@nombre-marketplace
+
+# Cargar un plugin local o remoto solo para la sesión actual
+claude --plugin-dir ./mi-plugin
+claude --plugin-url https://example.com/mi-plugin.zip</code></pre>
 
       <h3>Alcance según plataforma</h3>
       <div class="table-wrap">
@@ -1293,9 +1389,9 @@ flowchart LR
             <tr><th>Plataforma</th><th>Alcance de compartición</th></tr>
           </thead>
           <tbody>
-            <tr><td><strong>Claude.ai</strong></td><td>Individual (cada usuario sube las suyas)</td></tr>
+            <tr><td><strong>Claude.ai</strong></td><td>Individual (cada usuario sube las suyas) · provisión org en planes Team/Enterprise</td></tr>
             <tr><td><strong>Claude API</strong></td><td>Workspace-wide (todos los miembros del workspace)</td></tr>
-            <tr><td><strong>Claude Code</strong></td><td>Personal (<code>~/.claude/skills/</code>) o proyecto (<code>.claude/skills/</code>)</td></tr>
+            <tr><td><strong>Claude Code</strong></td><td>Enterprise (managed settings) → Personal (<code>~/.claude/skills/</code>) → Proyecto (<code>.claude/skills/</code>) → Plugin. Ante conflicto de nombres, gana el nivel superior.</td></tr>
           </tbody>
         </table>
       </div>
@@ -1307,10 +1403,11 @@ flowchart LR
 
       <h3>La Skill no se activa</h3>
       <ol>
-        <li>Revisa el campo <code>description</code> — debe ser específico y "pushy".</li>
+        <li>Revisa el campo <code>description</code> — debe ser específico y "pushy". Puedes añadir <code>when_to_use</code> con frases trigger.</li>
         <li>Incluye triggers explícitos: <em>"Use when the user mentions X, Y, or Z"</em>.</li>
-        <li>Verifica que el <code>name</code> cumple las restricciones (solo minúsculas, números, guiones).</li>
-        <li>Comprueba que la Skill está en el directorio correcto.</li>
+        <li>Pregunta <em>"What skills are available?"</em> para verificar que Claude ve la skill, y ejecuta <code>/doctor</code> para diagnosticar.</li>
+        <li>Comprueba que la Skill está en el directorio correcto y que el nombre cumple las restricciones.</li>
+        <li><strong>Presupuesto de descripciones</strong>: con muchas skills instaladas, las descripciones se recortan (cap de 1.536 chars por skill, presupuesto global ≈1% de la ventana de contexto). Ajustable con <code>skillListingBudgetFraction</code> en settings.</li>
       </ol>
 
       <h3>Errores de runtime</h3>
@@ -1401,6 +1498,8 @@ When reviewing Python code, evaluate these areas in order:
         <li><strong>Audita exhaustivamente</strong> Skills de terceros: revisa SKILL.md, scripts y recursos.</li>
         <li><strong>Fuentes externas son peligrosas
         </strong>: Skills que hacen fetch de URLs pueden contener instrucciones maliciosas (<em>prompt injection</em>).</li>
+        <li><strong>Ojo con <code>allowed-tools</code> en repos ajenos</strong>: una skill de proyecto puede auto-concederse permisos de tools. En Claude Code solo surte efecto tras aceptar el diálogo de confianza del workspace — revisa <code>.claude/skills/</code> antes de confiar en un repo.</li>
+        <li><strong><code>disableSkillShellExecution</code></strong>: ajuste (ideal en managed settings) que desactiva la inyección dinámica <code>!`comando`</code> en skills de usuario/proyecto/plugin.</li>
       </ul>
 
       <h3>Vectores de riesgo</h3>
@@ -1432,26 +1531,29 @@ When reviewing Python code, evaluate these areas in order:
       <h2><span class="h2-num">10</span> Estándar abierto: agentskills.io <span class="tag tag-new" style="margin-left:8px">NEW</span></h2>
 
       <div class="callout callout-new">
-        <div class="callout-title">Diciembre 2025 · Anthropic libera el estándar</div>
+        <div class="callout-title">18 de diciembre de 2025 · Anthropic libera el estándar</div>
         <p>Anthropic publicó la especificación de Agent Skills como un <strong>estándar abierto</strong>,
         gobernado en <a href="https://agentskills.io" target="_blank" rel="noopener">agentskills.io</a>,
         siguiendo el mismo modelo que MCP. El formato <code>SKILL.md</code> es ahora
         <strong>cross-platform</strong>: la misma Skill funciona en Claude, OpenAI Codex, Cursor,
-        GitHub Copilot, Gemini CLI y +20 plataformas adoptantes.</p>
+        GitHub Copilot, Gemini CLI y <strong>más de 40 herramientas</strong> listadas en el
+        showcase oficial de clientes.</p>
       </div>
 
-      <h3>Plataformas adoptantes</h3>
+      <h3>Plataformas adoptantes (selección del showcase oficial)</h3>
       <div class="ecosystem">
         <div class="eco-card"><span class="eco-emoji">⚡</span>Claude Code</div>
         <div class="eco-card"><span class="eco-emoji">💬</span>Claude.ai</div>
-        <div class="eco-card"><span class="eco-emoji">🔌</span>Claude API</div>
         <div class="eco-card"><span class="eco-emoji">🤖</span>OpenAI Codex</div>
         <div class="eco-card"><span class="eco-emoji">💎</span>Gemini CLI</div>
         <div class="eco-card"><span class="eco-emoji">🐙</span>GitHub Copilot</div>
         <div class="eco-card"><span class="eco-emoji">⌨️</span>Cursor</div>
         <div class="eco-card"><span class="eco-emoji">📝</span>VS Code</div>
-        <div class="eco-card"><span class="eco-emoji">☁️</span>Azure Agent SDK</div>
-        <div class="eco-card"><span class="eco-emoji">🎨</span>Canva</div>
+        <div class="eco-card"><span class="eco-emoji">🧠</span>JetBrains Junie</div>
+        <div class="eco-card"><span class="eco-emoji">🌱</span>Spring AI</div>
+        <div class="eco-card"><span class="eco-emoji">🦆</span>Goose</div>
+        <div class="eco-card"><span class="eco-emoji">❄️</span>Snowflake Cortex</div>
+        <div class="eco-card"><span class="eco-emoji">🧱</span>Databricks Genie</div>
       </div>
 
       <h3>Especificación oficial</h3>
@@ -1463,7 +1565,10 @@ When reviewing Python code, evaluate these areas in order:
 └── ...               # Cualquier otro archivo o directorio</code></pre>
 
       <p>La especificación completa está versionada en GitHub:
-      <a href="https://github.com/agentskills/agentskills" target="_blank" rel="noopener">github.com/agentskills/agentskills</a></p>
+      <a href="https://github.com/agentskills/agentskills" target="_blank" rel="noopener">github.com/agentskills/agentskills</a>.
+      El mismo repositorio incluye <code>skills-ref</code>, la librería de referencia para validar skills:</p>
+      <pre><code class="language-bash">pip install skills-ref
+skills-ref validate ./mi-skill   # comprueba frontmatter y convenciones de nombres</code></pre>
     </section>
 
     <!-- ========== 11. DREAMING ========== -->
@@ -1471,10 +1576,11 @@ When reviewing Python code, evaluate these areas in order:
       <h2><span class="h2-num">11</span> Dreaming <span class="tag tag-preview" style="margin-left:8px">RESEARCH PREVIEW</span></h2>
 
       <div class="callout callout-new">
-        <div class="callout-title">Code with Claude 2026 · Nueva capa de memoria activa</div>
+        <div class="callout-title">6 de mayo de 2026 · Code with Claude · Nueva capa de memoria activa</div>
         <p><strong>Dreaming</strong> es un proceso programado que revisa las sesiones pasadas y los
-        stores de memoria del agente, extrae patrones y <strong>cura recuerdos</strong> para que
-        las Skills mejoren con el tiempo.</p>
+        stores de memoria del agente, extrae patrones de lo que funcionó (y lo que no) y
+        <strong>cura recuerdos</strong> para que los agentes mejoren entre sesiones. Está en
+        <em>research preview</em> dentro de Claude Managed Agents — requiere solicitar acceso.</p>
       </div>
 
       <p>
@@ -1529,26 +1635,30 @@ flowchart TB
       <p>
         <strong>Outcomes</strong> cambia el modelo de prompting: en lugar de instruir paso a paso,
         defines una <strong>rúbrica de éxito</strong> y el agente itera contra un grader independiente
-        hasta cumplirla.
+        hasta cumplirla. Es una capacidad de <strong>Claude Managed Agents</strong> (API), no un campo
+        del SKILL.md: tras crear la sesión se envía un evento <code>user.define_outcome</code>.
       </p>
 
-      <h3>Patrón de uso con Skills</h3>
-      <pre><code class="language-yaml">---
-name: report-generator
-description: Generates executive reports following company style guide.
-outcome:
-  rubric: |
-    - Report contains executive summary (max 200 words)
-    - All numeric claims have source citations
-    - Tone is formal but accessible
-    - Visualizations include alt-text for accessibility
-  grader: claude-opus-4-7
-  max_iterations: 5
----
+      <h3>Cómo se define un Outcome</h3>
+      <pre><code class="language-json">{
+  "type": "user.define_outcome",
+  "description": "Informe ejecutivo trimestral en informe.md",
+  "rubric": "- El informe contiene un executive summary (máx 200 palabras)\n- Toda cifra tiene cita de fuente\n- El tono es formal pero accesible\n- Las visualizaciones incluyen alt-text",
+  "max_iterations": 5
+}</code></pre>
+      <p>
+        La rúbrica puede ir inline o subirse vía Files API para reutilizarla entre sesiones.
+        <code>max_iterations</code> por defecto es 3 (máximo 20). Las <strong>Skills siguen siendo
+        el conocimiento procedimental</strong> (el "cómo"); el Outcome define el criterio de
+        aceptación (el "qué").
+      </p>
 
-# Report Generator
-
-[Instrucciones procedimentales...]</code></pre>
+      <div class="callout callout-warn">
+        <div class="callout-title">Rúbricas evaluables, no "vibes"</div>
+        <p>Cada criterio debe poder evaluarse de forma independiente. <em>"El CSV tiene una columna
+        price con valores numéricos"</em> es un criterio válido; <em>"los datos se ven bien"</em> no lo es
+        y produce loops ruidosos.</p>
+      </div>
 
       <h3>Loop de iteración</h3>
       <div class="mermaid-wrap">
@@ -1566,7 +1676,9 @@ flowchart LR
         <div class="callout-title">Por qué es importante</div>
         <p>El grader <strong>corre en su propio context window</strong> — no está contaminado por el
         razonamiento del agente. Esto reduce el riesgo de auto-engaño y mejora la fiabilidad de
-        Skills sensibles a calidad (informes, código de producción, contenido legal).</p>
+        Skills sensibles a calidad (informes, código de producción, contenido legal). Caso publicado:
+        añadir el grading loop a la generación de PowerPoint mejoró la calidad un <strong>10,1%
+        sin cambiar de modelo</strong>.</p>
       </div>
     </section>
 
@@ -1597,117 +1709,135 @@ flowchart TB
         </div>
       </div>
 
-      <h3>Skills como bloques de orquestación</h3>
+      <h3>Skills + subagentes en Claude Code</h3>
       <p>
-        Cada sub-agente puede cargar Skills diferentes. Una <strong>Skill de orquestación</strong>
-        describe el patrón de delegación:
+        En Claude Code la integración Skills↔subagentes es real y funciona en dos direcciones:
+        una skill puede <strong>ejecutarse en un subagente aislado</strong> (<code>context: fork</code>),
+        y un subagente puede <strong>precargar skills</strong> como material de referencia
+        (campo <code>skills</code> en su definición):
       </p>
       <pre><code class="language-yaml">---
-name: incident-investigation
-description: Coordinates a multi-agent investigation for production incidents.
-  Use when user reports an outage, anomaly, or unexplained system behavior.
-subagents:
-  - name: deploy-historian
-    skill: deploy-history-analysis
-  - name: log-detective
-    skill: error-log-triage
-  - name: metrics-analyst
-    skill: grafana-query
-shared_workspace: /tmp/incident-{{id}}/
----</code></pre>
+name: deep-research
+description: Research a topic thoroughly across the codebase.
+context: fork        # corre en contexto aislado
+agent: Explore       # subagente read-only optimizado para exploración
+---
+
+Research $ARGUMENTS thoroughly:
+
+1. Find relevant files using Glob and Grep
+2. Read and analyze the code
+3. Summarize findings with specific file references</code></pre>
 
       <h3>Managed Agents <span class="tag tag-new" style="margin-left:6px">NEW</span></h3>
       <p>
-        Presentados en <strong>Code with Claude 2026</strong> (mayo, Londres) y reforzados en mayo–junio,
+        Anunciados el <strong>6 de mayo de 2026</strong> en Code with Claude (San Francisco) y
+        ampliados en la edición de Londres (19 de mayo) — donde se presentó la ejecución en
+        <strong>sandbox propio</strong> y la conexión a <strong>servidores MCP privados</strong> —,
         los <strong>Managed Agents</strong> son la materialización productizada de la orquestación
-        multi-agente. El usuario describe una especificación; el agente <em>elige tools, ejecuta extremo
-        a extremo y entrega un PR listo para mergear</em>.
+        multi-agente: describes una especificación y el agente elige tools, ejecuta extremo a
+        extremo y entrega un PR listo para revisar.
       </p>
       <div class="callout callout-tip">
-        <div class="callout-title">Demo en vivo · Boris Cherny (Head of Claude Code)</div>
-        <p>En el keynote, Boris construyó en directo un <strong>dashboard de refunds</strong>
-        con idempotencia, soporte multi-divisa y audit logging — mostrando varias sesiones
-        de agente concurrentes con observabilidad en tiempo real y entrega de un PR mergeable.</p>
+        <div class="callout-title">Demo del keynote · Boris Cherny (creador de Claude Code)</div>
+        <p>En el keynote se construyó en directo un <strong>dashboard de refunds para "ACME"</strong>
+        con idempotencia (sin dobles reembolsos), soporte multi-divisa y audit logging para
+        compliance — con varias sesiones de agente concurrentes, observabilidad en tiempo real
+        y Claude descubriendo un edge-case usando la propia UI en desarrollo.</p>
       </div>
       <h4>Diferencia clave frente a un sub-agente clásico</h4>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Sub-agente</th><th>Managed Agent</th></tr></thead>
           <tbody>
-            <tr><td>Lo invoca el lead agent dentro de tu sesión</td><td>Se lanza como tarea independiente con webhook de finalización</td></tr>
-            <tr><td>Compartes tu ventana de contexto y tools</td><td>Espacio de trabajo aislado, tools seleccionadas por la spec</td></tr>
+            <tr><td>Lo invoca el lead agent dentro de tu sesión</td><td>Sesión independiente gestionada vía API (harness de Anthropic)</td></tr>
+            <tr><td>Compartes tu ventana de contexto y tools</td><td>Espacio de trabajo aislado (sandbox propio + MCP privados)</td></tr>
             <tr><td>El control queda contigo</td><td>Ejecución autónoma con <em>rúbrica</em> (Outcomes) y memoria persistente (Dreaming)</td></tr>
             <tr><td>Output: respuesta en chat</td><td>Output: PR / artefacto + registro auditable</td></tr>
           </tbody>
         </table>
       </div>
       <p style="margin-top:12px">
-        Las <strong>Skills</strong> siguen siendo el lenguaje común: una Managed Agent carga las Skills
+        Las <strong>Skills</strong> siguen siendo el lenguaje común: un Managed Agent carga las Skills
         relevantes para su dominio (refunds, migraciones, triaging) en lugar de re-empaquetar el
         conocimiento procedimental en cada spec.
       </p>
+
+      <div class="callout callout-new">
+        <div class="callout-title">Dynamic workflows (Opus 4.8 · research preview)</div>
+        <p>Con Opus 4.8, Claude Code puede planificar el trabajo y lanzar <strong>cientos de
+        subagentes en paralelo</strong> dentro de una misma sesión — la orquestación multi-agente
+        deja de ser un patrón manual para convertirse en capacidad del propio modelo.</p>
+      </div>
     </section>
 
     <!-- ========== 14. ADD-INS ========== -->
     <section id="addins" data-search>
-      <h2><span class="h2-num">14</span> Add-ins y Plugins SDK <span class="tag tag-new" style="margin-left:8px">NEW</span></h2>
+      <h2><span class="h2-num">14</span> Plugins SDK y ecosistema <span class="tag tag-new" style="margin-left:8px">NEW</span></h2>
 
       <p>
-        Los <strong>Add-ins</strong> permiten que Claude trabaje <strong>directamente dentro</strong>
-        de herramientas productivas (Notion, Figma, Atlassian, Canva, Slack) sin pasar por MCP o
-        connectors. Son el siguiente paso evolutivo de las Skills empaquetadas como plugins.
+        Los <strong>plugins</strong> empaquetan skills junto a agentes, hooks y servidores MCP en una
+        unidad instalable. En paralelo, Claude.ai ha incorporado <strong>apps interactivas</strong>
+        (enero 2026) y un directorio de <strong>connectors</strong> con más de 50 integraciones
+        (Notion, Figma, Canva, Slack…) — la vía recomendada para que las Skills actúen sobre
+        herramientas externas.
       </p>
 
-      <h3>Novedades del Plugins SDK (mayo 2026)</h3>
+      <h3>Novedades del sistema de plugins (mayo 2026)</h3>
       <div class="feature-grid">
         <div class="feature-card">
           <div class="feature-icon feature-icon-purple">📦</div>
           <h4>Dependencias entre plugins</h4>
           <p><code>claude plugin disable</code> rechaza la operación si otro plugin habilitado
-          depende del target, mostrando una cadena de desactivación copiable.</p>
+          depende del target, mostrando la cadena de desactivación. <code>enable</code> activa
+          dependencias transitivas y el <code>marketplace.json</code> admite restricciones semver.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon feature-icon-cyan">💰</div>
           <h4>Coste de contexto proyectado</h4>
-          <p>El pane <code>/plugin marketplace browse</code> muestra estimaciones de tokens
-          por turno y por invocación antes de instalar.</p>
+          <p><code>/plugin show</code> y el pane <code>/plugin browse</code> muestran el inventario
+          de componentes (skills, agents, hooks, MCP) y los <strong>tokens estimados</strong> que
+          añade cada plugin por sesión, antes de instalar.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon feature-icon-blue">📎</div>
-          <h4>Carga desde .zip y URL</h4>
-          <p>El flag <code>--plugin-dir</code> acepta archivos <code>.zip</code> y el nuevo
-          <code>--plugin-url</code> descarga un archivo desde URL para la sesión actual.</p>
+          <h4>Scaffolding y carga remota</h4>
+          <p><code>claude plugin init</code> hace el scaffolding de un plugin nuevo
+          (manifest + SKILL.md inicial). <code>--plugin-url</code> descarga un <code>.zip</code>
+          desde una URL y lo carga solo para la sesión actual.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon feature-icon-amber">🕒</div>
-          <h4>Última actualización visible</h4>
-          <p>Los panes <code>browse</code> y <code>discover</code> muestran cuándo fue actualizado
-          cada plugin — útil para identificar abandono.</p>
+          <div class="feature-icon feature-icon-amber">🎛️</div>
+          <h4><code>defaultEnabled: false</code></h4>
+          <p>Un plugin puede declararse en <code>plugin.json</code> o en la entrada del marketplace
+          como <em>instalado pero desactivado por defecto</em> (v2.1.154). Reduce ruido en
+          organizaciones con catálogos grandes.</p>
         </div>
       </div>
 
       <h3>Manifest de plugin</h3>
-      <pre><code class="language-yaml"># .claude-plugin/plugin.json (manifest obligatorio)
+      <pre><code class="language-yaml"># .claude-plugin/plugin.json (manifest)
 {
   "name": "data-science-toolkit",
   "version": "2.1.0",
-  "description": "Pandas, Polars, and visualization skills",
-  "skills": ["./skills/pandas-helpers", "./skills/plotting"],
-  "agents": ["./agents/eda-explorer.md"],
-  "hooks": [{"event": "pre-commit", "script": "./hooks/lint.sh"}],
-  "mcp_servers": [{"name": "duckdb", "command": "duckdb-mcp"}],
-  "dependencies": ["python-base@^1.0"]
-}</code></pre>
+  "description": "Pandas, Polars, and visualization skills"
+}
+# Los componentes se descubren por convención de directorios:
+# skills/   agents/   hooks/   .mcp.json
+# Las dependencias (semver) se declaran en el marketplace.json</code></pre>
 
       <h3>Comandos rápidos</h3>
-      <pre><code class="language-bash"># Probar un plugin desde una URL sin añadirlo permanentemente
+      <pre><code class="language-bash"># Crear el esqueleto de un plugin nuevo
+claude plugin init
+
+# Probar un plugin desde una URL sin añadirlo permanentemente
 claude --plugin-url https://example.com/my-plugin.zip
 
-# Instalar desde archivo local zipeado
-claude --plugin-dir ./my-plugin.zip
+# Cargar un plugin desde un directorio local
+claude --plugin-dir ./my-plugin
 
-# Ver estimación de coste antes de instalar
-/plugin marketplace browse --show-cost</code></pre>
+# Ver inventario y coste de contexto antes de instalar
+/plugin show data-science-toolkit</code></pre>
     </section>
 
     <!-- ========== 15. ENTERPRISE ========== -->
@@ -1726,51 +1856,41 @@ claude --plugin-dir ./my-plugin.zip
         <li>Políticas de seguridad que restringen Skills de terceros.</li>
       </ul>
 
-      <h3>Control granular de roles (mayo–junio 2026) <span class="tag tag-new" style="margin-left:6px">NEW</span></h3>
+      <h3>Control granular con custom roles (mayo–junio 2026) <span class="tag tag-new" style="margin-left:6px">NEW</span></h3>
       <div class="feature-grid">
         <div class="feature-card">
           <div class="feature-icon feature-icon-purple">🔐</div>
           <h4>Connector permissions en custom roles</h4>
-          <p>Los administradores Enterprise pueden definir <strong>qué connectors y tools</strong>
-          puede usar cada rol personalizado. Una Skill que invoca un connector vetado para el rol
-          se bloquea antes de ejecutarse — sin necesidad de re-escribir la Skill.</p>
+          <p>Los administradores Enterprise pueden definir <strong>qué connectors — y qué tools
+          concretas de cada connector</strong> — puede usar cada rol personalizado. Una Skill que
+          invoca un connector vetado para el rol se bloquea sin re-escribir la Skill.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon feature-icon-cyan">👤</div>
           <h4>Admin permissions en custom roles</h4>
-          <p>Desde el 2 de junio, los planes Enterprise permiten delegar tareas administrativas
-          (gestión de Skills, plugins, marketplaces) a roles que <em>no</em> son global admin —
-          útil para equipos de plataforma o seguridad.</p>
+          <p>Los custom roles pueden conceder permisos administrativos por área
+          (Identity &amp; Access, Billing, Analytics, Privacy, User Management, Libraries)
+          sin convertir al miembro en Owner — útil para equipos de plataforma o seguridad.</p>
         </div>
       </div>
 
-      <h3>Claude Partner Network <span class="tag tag-new" style="margin-left:6px">NEW</span></h3>
+      <h3>Skills prebuilt y de partners</h3>
       <p>
-        Junto con las novedades enterprise, Anthropic ha publicado el <strong>Services Track</strong>
-        y el <strong>Claude Partner Hub</strong>: un catálogo donde los clientes encuentran partners
-        cualificados para implantación de Skills/Managed Agents, y donde las consultoras ven su
-        certificación, despliegues y siguientes pasos en el programa.
+        Anthropic publica skills oficiales (PowerPoint, Excel, Word, PDF…) y partners como
+        <strong>Canva, Notion, Figma o Box</strong> mantienen skills prebuilt para sus productos,
+        instalables desde los marketplaces y el directorio de connectors.
       </p>
 
-      <h3>Skills prebuilt de partners</h3>
-      <div class="ecosystem">
-        <div class="eco-card"><span class="eco-emoji">🎨</span>Canva</div>
-        <div class="eco-card"><span class="eco-emoji">📝</span>Notion</div>
-        <div class="eco-card"><span class="eco-emoji">🖼️</span>Figma</div>
-        <div class="eco-card"><span class="eco-emoji">🟦</span>Atlassian</div>
-        <div class="eco-card"><span class="eco-emoji">💼</span>Claude Finance</div>
-        <div class="eco-card"><span class="eco-emoji">📊</span>Salesforce</div>
-      </div>
-
-      <h3>Marketplaces de la comunidad</h3>
+      <h3>Marketplaces y directorios</h3>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Marketplace</th><th>Contenido</th><th>Foco</th></tr></thead>
           <tbody>
-            <tr><td><code>anthropics/skills</code></td><td>Skills oficiales</td><td>PowerPoint, Excel, Word, PDF</td></tr>
-            <tr><td><code>netresearch/claude-code-marketplace</code></td><td>Skills cross-platform</td><td>Portables a 30+ agentes</td></tr>
-            <tr><td><code>tonsofskills.com</code></td><td>425 plugins · 2.810 skills · 200 agentes</td><td>CLI <code>ccpi</code> como gestor</td></tr>
-            <tr><td>ClaudePluginHub</td><td>Catálogos curados por dominio</td><td>Discovery y rankings</td></tr>
+            <tr><td><code>claude-plugins-official</code></td><td>Directorio oficial gestionado por Anthropic</td><td>Registrado automáticamente en Claude Code</td></tr>
+            <tr><td><code>anthropics/skills</code></td><td>Skills oficiales open-source</td><td>PowerPoint, Excel, Word, PDF…</td></tr>
+            <tr><td><code>claude-community</code></td><td>Marketplace público de la comunidad</td><td>Plugins de terceros</td></tr>
+            <tr><td><code>skills.sh</code></td><td>Hub de distribución de skills</td><td>Discovery cross-platform</td></tr>
+            <tr><td><code>claudemarketplaces.com</code></td><td>Directorio de marketplaces</td><td>Skills, MCP servers y plugins</td></tr>
           </tbody>
         </table>
       </div>
@@ -1778,52 +1898,53 @@ claude --plugin-dir ./my-plugin.zip
 
     <!-- ========== 16. SDK PYTHON ========== -->
     <section id="sdk" data-search>
-      <h2><span class="h2-num">16</span> Python SDK &amp; portabilidad <span class="tag tag-new" style="margin-left:8px">NEW</span></h2>
+      <h2><span class="h2-num">16</span> Tooling Python: skills-ref &amp; portabilidad <span class="tag tag-new" style="margin-left:8px">NEW</span></h2>
 
       <p>
-        El <strong>Agent Skills SDK</strong> es la implementación de referencia en Python,
-        diseñada para tratar Skills como <em>unidades abstractas de expertise</em>
-        consumibles por cualquier framework de agentes.
+        Junto con la especificación, el repositorio del estándar incluye
+        <strong><code>skills-ref</code></strong>: la <em>librería de referencia</em> en Python
+        (con CLI y port en Go con paridad total) para trabajar con Skills desde código.
+        Está pensada como implementación de demostración para quien construye su propio agente.
       </p>
 
-      <h3>Capacidades del SDK</h3>
+      <h3>Qué ofrece skills-ref</h3>
       <ul>
-        <li><strong>Carga programática</strong>: descubrir Skills desde directorios, URLs o packages.</li>
-        <li><strong>Validación</strong>: chequear que <code>SKILL.md</code> cumple el estándar.</li>
-        <li><strong>Ejecución</strong>: invocar Skills desde código, con o sin agente.</li>
-        <li><strong>Storage abstraction</strong>: locales, S3, GCS, repos git, registries privados.</li>
+        <li><strong><code>validate</code></strong>: comprueba que el <code>SKILL.md</code> cumple el estándar (frontmatter, convenciones de nombres).</li>
+        <li><strong><code>read_properties</code></strong>: extrae los metadatos del frontmatter de forma programática.</li>
+        <li><strong><code>to_prompt</code></strong>: genera el bloque XML de metadatos de skills listo para inyectar en el system prompt de tu agente (nivel 1 de progressive disclosure).</li>
       </ul>
 
       <h3>Ejemplo de uso</h3>
-      <pre><code class="language-python">from agent_skills import SkillRegistry, Skill
+      <pre><code class="language-python">from pathlib import Path
+from skills_ref import validate, read_properties, to_prompt
 
-# Cargar Skills desde múltiples fuentes
-registry = SkillRegistry()
-registry.load_from_path("~/.claude/skills/")
-registry.load_from_git("github.com/anthropics/skills")
-registry.load_from_url("https://my-cdn/team-skills.zip")
+# Validar una skill antes de distribuirla
+problems = validate(Path("mi-skill"))
+if problems:
+    print("Errores de validación:", problems)
 
-# Descubrir Skills relevantes para una tarea
-matches = registry.discover(
-    task="Generar un dashboard de ventas mensual",
-    top_k=3,
-)
-for skill in matches:
-    print(f"{skill.name}: {skill.description[:80]}...")
+# Leer los metadatos del frontmatter
+props = read_properties(Path("mi-skill"))
+print(props.name, "→", props.description)
 
-# Ejecutar una Skill específica con tu agente preferido
-result = registry.invoke(
-    skill_name="dashboard-builder",
-    inputs={"data_source": "sales.csv", "period": "monthly"},
-    agent_backend="claude-opus-4-7",  # o "gpt-4", "gemini", etc.
-)</code></pre>
+# Generar el bloque de metadatos para el system prompt de tu agente
+print(to_prompt([Path("mi-skill"), Path("otra-skill")]))</code></pre>
+
+      <div class="callout callout-info">
+        <div class="callout-title">¿Y para implementar soporte en tu propio agente?</div>
+        <p>agentskills.io publica una guía específica
+        (<em>Adding skills support to your agent</em>) con el contrato completo: cargar metadatos
+        al arranque, activar la skill por <code>description</code>, leer recursos bajo demanda y
+        ejecutar scripts. Con eso, cualquier framework (LangChain, agente propio en Python…)
+        puede consumir el mismo <code>SKILL.md</code>.</p>
+      </div>
 
       <h3>Portabilidad cross-platform</h3>
       <div class="callout callout-info">
         <div class="callout-title">Una Skill, múltiples agentes</div>
         <p>El mismo <code>SKILL.md</code> que escribes para Claude funciona en Codex (OpenAI),
-        Cursor, Gemini CLI y +20 plataformas adoptantes. <strong>Cero vendor lock-in</strong>
-        a nivel de conocimiento procedimental.</p>
+        Cursor, Gemini CLI, Copilot y más de 40 herramientas adoptantes.
+        <strong>Cero vendor lock-in</strong> a nivel de conocimiento procedimental.</p>
       </div>
 
       <div class="mermaid-wrap">
@@ -1835,7 +1956,7 @@ flowchart LR
   SK --> P4[Cursor]
   SK --> P5[Gemini CLI]
   SK --> P6[Copilot]
-  SK --> P7[Custom Agent<br/>via SDK]
+  SK --> P7[Custom Agent<br/>vía skills-ref]
         </div>
       </div>
     </section>
@@ -1847,16 +1968,16 @@ flowchart LR
       <p>
         Entre el cierre de <em>Code with Claude 2026</em> y el inicio de junio, Anthropic ha publicado
         una tanda de mejoras incrementales que tocan de lleno el día a día de quien escribe Skills.
-        Esta es la lista cerrada a <strong>7 de junio de 2026</strong>.
+        Esta es la lista cerrada a <strong>11 de junio de 2026</strong>.
       </p>
 
       <div class="feature-grid">
         <div class="feature-card">
           <div class="feature-icon feature-icon-purple">♻️</div>
-          <h4><code>/reload-skills</code></h4>
-          <p>Claude Code <strong>v2.1.157</strong> (31 mayo) introduce un comando que re-escanea
-          los directorios de Skills <em>sin reiniciar la sesión</em>. Iterar sobre una Skill ya no
-          obliga a abrir un Claude nuevo.</p>
+          <h4><code>/reload-skills</code> + live reload</h4>
+          <p>Claude Code <strong>v2.1.157</strong> (29 mayo) introduce un comando que re-escanea
+          los directorios de Skills <em>sin reiniciar la sesión</em>. Además, los directorios de
+          skills se <strong>vigilan en vivo</strong>: editar un SKILL.md surte efecto en la sesión actual.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon feature-icon-cyan">🪝</div>
@@ -1882,24 +2003,27 @@ flowchart LR
         <div class="feature-card">
           <div class="feature-icon feature-icon-purple">🎛️</div>
           <h4><code>defaultEnabled: false</code></h4>
-          <p>Un plugin puede declararse en <code>plugin.json</code> o en la entrada del marketplace
-          como <em>instalado pero desactivado por defecto</em>. Reduce ruido en organizaciones
-          con catálogos grandes.</p>
+          <p>Desde <strong>v2.1.154</strong> (28 mayo), un plugin puede declararse en
+          <code>plugin.json</code> o en la entrada del marketplace como <em>instalado pero
+          desactivado por defecto</em>. Reduce ruido en organizaciones con catálogos grandes.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon feature-icon-cyan">🧠</div>
           <h4>Claude Opus 4.8 (28 mayo)</h4>
-          <p>Mejora explícita en <strong>agentic skills</strong>, coding, razonamiento y trabajo
-          práctico de conocimiento respecto a Opus 4.7. Cabecera API: <code>claude-opus-4-8</code>.</p>
+          <p>Mejora en benchmarks de <strong>agentic skills</strong>, coding, razonamiento y trabajo
+          de oficina respecto a Opus 4.7, con <em>dynamic workflows</em> (cientos de subagentes
+          paralelos, research preview). Model string: <code>claude-opus-4-8</code>.</p>
         </div>
       </div>
 
       <div class="callout callout-warn" style="margin-top:24px">
-        <div class="callout-title">📅 Facturación separada del Agent SDK desde 15 de junio 2026</div>
-        <p>A partir del <strong>15 de junio de 2026</strong>, el uso del <strong>Claude Agent SDK</strong>
-        y de las <strong>Claude Code GitHub Actions</strong> se factura <em>separadamente</em>
-        del Claude Code interactivo. Si distribuyes Skills empaquetadas para correr en CI/CD
-        o vía SDK propio, revisa tu telemetría antes de la fecha de corte.</p>
+        <div class="callout-title">📅 Facturación separada del Agent SDK desde el 15 de junio 2026</div>
+        <p>Anunciado el 14 de mayo: a partir del <strong>15 de junio de 2026</strong>, el uso
+        programático (<strong>Agent SDK</strong>, <code>claude -p</code>, <strong>GitHub Actions</strong>
+        y apps de terceros) deja el pool de la suscripción y pasa a un <strong>crédito mensual
+        independiente</strong> (~$20 Pro · $100 Max 5x · $200 Max 20x, a tarifas API). El crédito es
+        por usuario y no se acumula; las sesiones interactivas de Claude Code no se ven afectadas.
+        Si distribuyes Skills para CI/CD, revisa tu telemetría antes del corte.</p>
       </div>
 
       <h3>Ejemplo: hook que instala una Skill al arrancar</h3>
@@ -1931,6 +2055,8 @@ disallowed-tools:
 
 Eres un revisor estricto: solo puedes leer (Read, Grep, Glob) y razonar.
 Nunca propongas un comando — explica qué falla y deja el fix al humano.</code></pre>
+      <p>La restricción de <code>disallowed-tools</code> se levanta automáticamente con tu
+      siguiente mensaje — es un sandbox por invocación, no permanente.</p>
     </section>
 
     <!-- ========== 18. ROADMAP ========== -->
@@ -1941,47 +2067,47 @@ Nunca propongas un comando — explica qué falla y deja el fix al humano.</code
         <div class="timeline-item">
           <div class="timeline-date">OCT 2025</div>
           <div class="timeline-title">Lanzamiento inicial de Agent Skills</div>
-          <div class="timeline-desc">Anthropic introduce Skills en Claude.ai y Claude Code con progressive disclosure y skills prebuilt para Office (pptx, xlsx, docx, pdf).</div>
+          <div class="timeline-desc">Anthropic introduce Skills en Claude.ai, Claude Code y la API con progressive disclosure y skills prebuilt para Office (pptx, xlsx, docx, pdf).</div>
         </div>
         <div class="timeline-item">
-          <div class="timeline-date">DIC 2025</div>
+          <div class="timeline-date">DIC 18 · 2025</div>
           <div class="timeline-title">Estándar abierto en agentskills.io</div>
-          <div class="timeline-desc">Anthropic libera la especificación como estándar cross-platform. OpenAI adopta el formato para Codex CLI y ChatGPT.</div>
+          <div class="timeline-desc">Anthropic libera la especificación + librería de referencia <code>skills-ref</code>. OpenAI (Codex), Cursor, Copilot, Gemini CLI y decenas de herramientas adoptan el formato.</div>
         </div>
         <div class="timeline-item">
-          <div class="timeline-date">ENE 2026</div>
-          <div class="timeline-title">Enterprise Management</div>
-          <div class="timeline-desc">Provisión centralizada de Skills para planes Team y Enterprise. Skills prebuilt de Canva, Notion, Figma, Atlassian.</div>
+          <div class="timeline-date">ENE 26 · 2026</div>
+          <div class="timeline-title">Apps interactivas en Claude</div>
+          <div class="timeline-desc">Interfaces en vivo dentro de la conversación (Figma, Asana, Canva…). El directorio de connectors supera las 50 integraciones.</div>
         </div>
         <div class="timeline-item">
-          <div class="timeline-date">MAR 2026</div>
-          <div class="timeline-title">Python SDK v1.0</div>
-          <div class="timeline-desc">Implementación de referencia open-source. Cualquier framework de agentes puede consumir Skills.</div>
+          <div class="timeline-date">MAY 6 · 2026</div>
+          <div class="timeline-title">Code with Claude (San Francisco)</div>
+          <div class="timeline-desc">Anuncio de Claude Managed Agents con Dreaming (research preview), Outcomes y Multi-Agent Orchestration (beta pública). Demo del dashboard de refunds en el keynote.</div>
         </div>
         <div class="timeline-item">
-          <div class="timeline-date">MAY 2026</div>
-          <div class="timeline-title">Code with Claude 2026</div>
-          <div class="timeline-desc">Anuncio de Dreaming, Outcomes, Multi-Agent Orchestration, Add-ins y Claude Finance con 10 agentes prebuilt. Boris Cherny demo en vivo de Managed Agents construyendo un dashboard de refunds.</div>
+          <div class="timeline-date">MAY 19 · 2026</div>
+          <div class="timeline-title">Code with Claude (Londres)</div>
+          <div class="timeline-desc">Managed Agents con sandbox propio y conexión a servidores MCP privados. Demos de Managed Agents por el equipo de Claude Developer Platform.</div>
         </div>
         <div class="timeline-item">
           <div class="timeline-date">MAY 28 · 2026</div>
-          <div class="timeline-title">Claude Opus 4.8 + connector permissions</div>
-          <div class="timeline-desc">Mejor desempeño en agentic skills frente a Opus 4.7. Enterprise: control de connectors por custom role.</div>
+          <div class="timeline-title">Claude Opus 4.8 + Claude Code v2.1.154</div>
+          <div class="timeline-desc">Mejor desempeño en agentic skills frente a Opus 4.7; dynamic workflows en research preview. <code>defaultEnabled: false</code> en plugins; Opus 4.8 por defecto en Claude Code.</div>
         </div>
         <div class="timeline-item">
-          <div class="timeline-date">MAY 31 · 2026</div>
+          <div class="timeline-date">MAY 29 · 2026</div>
           <div class="timeline-title">Claude Code v2.1.157</div>
-          <div class="timeline-desc">Comando <code>/reload-skills</code>, hook <code>reloadSkills: true</code> en <code>SessionStart</code>, auto-load de <code>.claude/skills/</code>, <code>disallowed-tools</code> en frontmatter, <code>defaultEnabled: false</code> en plugins.</div>
+          <div class="timeline-desc">Comando <code>/reload-skills</code>, hook <code>reloadSkills: true</code> en <code>SessionStart</code>, auto-load de skills/plugins en <code>.claude/skills/</code> y <code>disallowed-tools</code> en frontmatter.</div>
         </div>
         <div class="timeline-item">
           <div class="timeline-date">JUN 15 · 2026</div>
           <div class="timeline-title">Facturación separada del Agent SDK</div>
-          <div class="timeline-desc">Claude Agent SDK y Claude Code GitHub Actions pasan a métrica de facturación independiente del Claude Code interactivo.</div>
+          <div class="timeline-desc">El uso programático (Agent SDK, <code>claude -p</code>, GitHub Actions) pasa a un crédito mensual independiente de la suscripción.</div>
         </div>
         <div class="timeline-item">
-          <div class="timeline-date">PRÓXIMO</div>
-          <div class="timeline-title">GA de Outcomes y Multi-Agent</div>
-          <div class="timeline-desc">Salida de beta pública y mejoras de observabilidad para orquestación multi-agente.</div>
+          <div class="timeline-date">ANUNCIADO</div>
+          <div class="timeline-title">Modelos clase Mythos para todos los clientes</div>
+          <div class="timeline-desc">Anthropic ha anunciado que llevará los modelos de la clase Mythos a todos los clientes; Outcomes y Multi-Agent siguen en beta pública camino de GA.</div>
         </div>
       </div>
     </section>
@@ -2020,11 +2146,15 @@ Nunca propongas un comando — explica qué falla y deja el fix al humano.</code
           <thead><tr><th>Comando</th><th>Descripción</th></tr></thead>
           <tbody>
             <tr><td><code>/mi-skill</code></td><td>Invocar Skill directamente (si <code>user-invocable</code>)</td></tr>
+            <tr><td><code>/reload-skills</code></td><td>Re-escanear directorios de skills sin reiniciar</td></tr>
+            <tr><td><code>/doctor</code></td><td>Diagnosticar skills (presupuesto de descripciones, etc.)</td></tr>
             <tr><td><code>/plugin marketplace add &lt;repo&gt;</code></td><td>Añadir un marketplace</td></tr>
-            <tr><td><code>/plugin add &lt;path&gt;</code></td><td>Instalar plugin local</td></tr>
-            <tr><td><code>claude --plugin-url &lt;url&gt;</code></td><td>Probar plugin desde URL (sesión)</td></tr>
-            <tr><td><code>claude --plugin-dir &lt;path|zip&gt;</code></td><td>Cargar plugin desde dir o zip</td></tr>
+            <tr><td><code>/plugin install &lt;plugin&gt;@&lt;marketplace&gt;</code></td><td>Instalar un plugin</td></tr>
+            <tr><td><code>/plugin show &lt;name&gt;</code></td><td>Inventario + coste de contexto proyectado</td></tr>
+            <tr><td><code>claude plugin init</code></td><td>Scaffolding de un plugin nuevo</td></tr>
+            <tr><td><code>claude --plugin-dir &lt;path&gt;</code> / <code>--plugin-url &lt;url&gt;</code></td><td>Cargar plugin local o remoto (solo sesión)</td></tr>
             <tr><td><code>claude plugin disable &lt;name&gt;</code></td><td>Desactivar con chequeo de dependencias</td></tr>
+            <tr><td><code>skills-ref validate &lt;path&gt;</code></td><td>Validar una skill contra el estándar abierto</td></tr>
           </tbody>
         </table>
       </div>
@@ -2046,12 +2176,17 @@ Nunca propongas un comando — explica qué falla y deja el fix al humano.</code
       <ul>
         <li><a href="https://agentskills.io" target="_blank" rel="noopener">agentskills.io</a> — Sitio oficial del estándar</li>
         <li><a href="https://agentskills.io/specification" target="_blank" rel="noopener">Especificación completa</a></li>
-        <li><a href="https://github.com/agentskills/agentskills" target="_blank" rel="noopener">Repositorio GitHub (spec + SDK Python)</a></li>
+        <li><a href="https://agentskills.io/clients" target="_blank" rel="noopener">Client Showcase</a> — 40+ herramientas adoptantes</li>
+        <li><a href="https://github.com/agentskills/agentskills" target="_blank" rel="noopener">Repositorio GitHub (spec + skills-ref)</a></li>
+        <li><a href="https://pypi.org/project/skills-ref/" target="_blank" rel="noopener">skills-ref en PyPI</a></li>
       </ul>
 
       <h3>Novedades 2026</h3>
       <ul>
         <li><a href="https://claude.com/blog/new-in-claude-managed-agents" target="_blank" rel="noopener">Dreaming, Outcomes y Multi-Agent Orchestration (Anthropic)</a></li>
+        <li><a href="https://platform.claude.com/docs/en/managed-agents/define-outcomes" target="_blank" rel="noopener">Docs: Define outcomes (Managed Agents)</a></li>
+        <li><a href="https://www.anthropic.com/news/claude-opus-4-8" target="_blank" rel="noopener">Introducing Claude Opus 4.8</a></li>
+        <li><a href="https://code.claude.com/docs/en/changelog" target="_blank" rel="noopener">Claude Code changelog</a></li>
         <li><a href="https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills" target="_blank" rel="noopener">Engineering: Equipping agents for the real world</a></li>
         <li><a href="https://developers.openai.com/codex/skills" target="_blank" rel="noopener">Agent Skills en OpenAI Codex</a></li>
       </ul>
@@ -2059,8 +2194,9 @@ Nunca propongas un comando — explica qué falla y deja el fix al humano.</code
       <h3>Marketplaces y comunidad</h3>
       <ul>
         <li><a href="https://github.com/anthropics/skills" target="_blank" rel="noopener">Repositorio público de Skills (Anthropic)</a></li>
+        <li><a href="https://github.com/anthropics/claude-plugins-official" target="_blank" rel="noopener">claude-plugins-official</a> — Directorio oficial de plugins</li>
+        <li><a href="https://skills.sh" target="_blank" rel="noopener">skills.sh</a> — Hub de distribución de skills</li>
         <li><a href="https://github.com/netresearch/claude-code-marketplace" target="_blank" rel="noopener">netresearch/claude-code-marketplace</a></li>
-        <li><a href="https://www.claudepluginhub.com" target="_blank" rel="noopener">ClaudePluginHub</a></li>
         <li><a href="https://claudemarketplaces.com" target="_blank" rel="noopener">claudemarketplaces.com</a></li>
       </ul>
 
@@ -2076,9 +2212,10 @@ Nunca propongas un comando — explica qué falla y deja el fix al humano.</code
         <div>
           <h5>Sobre esta guía</h5>
           <p style="font-size:13px;line-height:1.6">
-            Edición 2026 actualizada con las novedades anunciadas en Code with Claude 2026,
-            las últimas releases de Claude Code (mayo–junio 2026), Opus 4.8 y el estándar
-            abierto agentskills.io. Material didáctico para cursos universitarios de IA y Big Data.
+            Edición 2026 actualizada con las novedades anunciadas en Code with Claude 2026
+            (San Francisco y Londres), las últimas releases de Claude Code (mayo 2026), Opus 4.8
+            y el estándar abierto agentskills.io. Datos contrastados con la documentación oficial
+            a 11 de junio de 2026. Material didáctico para cursos universitarios de IA y Big Data.
           </p>
         </div>
         <div>
@@ -2099,7 +2236,7 @@ Nunca propongas un comando — explica qué falla y deja el fix al humano.</code
         </div>
       </div>
       <p style="text-align:center;padding-top:24px;border-top:1px solid var(--color-border);font-size:12px">
-        Generado a partir de <code>agent-skills-guia-completa.md</code> · Actualizado a junio 2026 (v2026.06)
+        Actualizado y verificado a 11 de junio de 2026 (v2026.06.2)
         · <a href="https://agentskills.io" target="_blank" rel="noopener">agentskills.io</a>
       </p>
     </footer>
@@ -2155,12 +2292,26 @@ themeBtn.addEventListener('click', () => {
     themeVariables: isLight ? {
       primaryColor: '#d97757',
       primaryTextColor: '#1a1815',
+      primaryBorderColor: '#c5573d',
       lineColor: '#8a877e',
+      secondaryColor: '#f3f3ef',
+      tertiaryColor: '#ffffff',
+      background: '#ffffff',
+      mainBkg: '#f3f3ef',
+      nodeBorder: '#d4d1c7',
+      edgeLabelBackground: '#ffffff',
       fontFamily: 'Inter, sans-serif'
     } : {
       primaryColor: '#d97757',
       primaryTextColor: '#e6e9f0',
+      primaryBorderColor: '#d97757',
       lineColor: '#6b7280',
+      secondaryColor: '#1d2230',
+      tertiaryColor: '#161a24',
+      background: '#161a24',
+      mainBkg: '#1d2230',
+      nodeBorder: '#2c3344',
+      edgeLabelBackground: '#161a24',
       fontFamily: 'Inter, sans-serif'
     }
   });
@@ -2259,6 +2410,19 @@ searchInput.addEventListener('input', (e) => {
     if (match) visibleCount++;
   });
   searchEmpty.style.display = (q && visibleCount === 0) ? 'block' : 'none';
+});
+
+// Atajos de teclado: "/" o Cmd/Ctrl+K enfocan la búsqueda; Escape la limpia
+document.addEventListener('keydown', (e) => {
+  const typing = ['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName);
+  if ((e.key === '/' && !typing) || ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k')) {
+    e.preventDefault();
+    searchInput.focus();
+  } else if (e.key === 'Escape' && document.activeElement === searchInput) {
+    searchInput.value = '';
+    searchInput.dispatchEvent(new Event('input'));
+    searchInput.blur();
+  }
 });
 
 // ----- Progress bar + back to top -----
